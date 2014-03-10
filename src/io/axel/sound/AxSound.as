@@ -3,37 +3,46 @@ package io.axel.sound {
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
-	
-	import io.axel.Ax;
-	import io.axel.base.AxEntity;
 
 	/**
 	 * A sound object. For simple use cases, this class will be completely managed by Axel. However,
 	 * whenever you play a sound or music you will get the instance of this class returned to you in
 	 * order to do more advanced effects.
 	 */
-	public class AxSound extends AxEntity {
+	public class AxSound {
 		/** The internal flash sound object. */
-		private var sound:Sound;
+		public var sound:Sound;
 		/** The internal flash sound channel. */
-		protected var soundChannel:SoundChannel;
+		public var soundChannel:SoundChannel;
 		/** The internal flash sound transform. */
-		protected var soundTransform:SoundTransform;
+		public var soundTransform:SoundTransform;
 
 		/**
-		 * The volume of the sound.
+		 * The sound manager this sound belongs to.
+		 */
+		public var manager:AxSoundManager;
+		/**
+		 * The requested volume of the sound, between 0 and 1. The current volume can be accessed through the
+		 * volume property, which will be 0 if the sound is muted. This will always contained the requested
+		 * volume, even when muted.
 		 * @default 1
 		 */
-		public var volume:Number;
+		public var requestedVolume:Number;
 		/**
-		 * Whether or not the sound should loop.
+		 * The number of times this sound should loop. 0 means no looping.
 		 */
-		public var loop:Boolean;
+		public var loops:uint;
 		/**
-		 * The time (in ms) of how far into the sound it should start playing.
+		 * The time (in ms) of how far into the sound it should start playing. If looped, it will loop to this
+		 * point in the song.
 		 * @default 0
 		 */
 		public var start:Number;
+		/**
+		 * The panning of the sound between -1 (left) and 1 (right). 0 means balanced in the middle.
+		 */
+		public var panning:Number;
+		public var deltaVolume:Number;
 
 		/**
 		 * Creates a new sound object, but does not start playing the sound.
@@ -42,13 +51,16 @@ package io.axel.sound {
 		 * @param volume The volume to play the sound at.
 		 * @param loop Whether or not the sound should loop.
 		 * @param start The time (in ms) of how far into the sound it should start playing.
+		 * @param panning The panning of the sound between -1 (left) and 1 (right). 0 means balanced in the middle.
 		 */
-		public function AxSound(sound:Class, volume:Number = 1, loop:Boolean = false, start:Number = 0) {
+		public function AxSound(manager:AxSoundManager, sound:Class, volumeLevel:Number = 1, loops:uint = 0, start:Number = 0, panning:Number = 0) {
+			this.manager = manager;
 			this.sound = new sound();
-			this.volume = volume;
-			this.loop = loop;
+			this.requestedVolume = volumeLevel;
+			this.loops = loops;
 			this.start = start;
-			this.soundTransform = new SoundTransform(volume);
+			this.panning = panning;
+			this.soundTransform = new SoundTransform(volumeLevel, panning);
 		}
 
 		/**
@@ -57,9 +69,51 @@ package io.axel.sound {
 		 * @return
 		 */
 		public function play():AxSound {
-			soundChannel = sound.play(start, loop ? int.MAX_VALUE : 0, soundTransform);
+			soundChannel = sound.play(start, loops, soundTransform);
 			soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 			return this;
+		}
+		
+		public function set volume(volumeLevel:Number):void {
+			soundTransform.volume = volumeLevel;
+		}
+		
+		public function get volume():Number {
+			return soundTransform.volume;
+		}
+		
+		public function mute():void {
+			volume = 0;
+			// WHY?
+			// soundChannel.soundTransform = soundTransform;
+		}
+		
+		public function unmute():void {
+			volume = requestedVolume;
+		}
+		
+		public function fadeOut(duration:Number):void {
+			deltaVolume = requestedVolume / duration;
+		}
+		
+		public function fadeIn(duration:Number):void {
+			deltaVolume = -requestedVolume / duration;
+		}
+		
+		public function update():void {
+			if (deltaVolume > 0) {
+				volume += deltaVolume;
+				if (volume > requestedVolume) {
+					volume = requestedVolume;
+					deltaVolume = 0;
+				}
+			} else if (deltaVolume < 0) {
+				volume += deltaVolume;
+				if (volume < 0) {
+					volume = 0;
+					deltaVolume = 0;
+				}
+			}
 		}
 		
 		/**
@@ -70,33 +124,17 @@ package io.axel.sound {
 		private function onSoundComplete(event:Event):void {
 			destroy();
 		}
-
+		
 		/**
 		 * Destroys the sound, freeing up resources used.
 		 */
-		override public function destroy():void {
-			soundChannel.removeEventListener(Event.SOUND_COMPLETE, destroy);
+		public function destroy():void {
+			soundChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 			soundChannel.stop();
 			sound = null;
 			soundChannel = null;
 			soundTransform = null;
-			Ax.sounds.remove(this);
-			super.destroy();
-		}
-
-		/**
-		 * @inheritDoc
-		 */
-		override public function update():void {
-			updateVolume();
-		}
-
-		/**
-		 * Updates the sound transform and sound channel after the volume is changed.
-		 */
-		protected function updateVolume():void {
-			soundTransform.volume = Ax.soundMuted ? 0 : volume * Ax.soundVolume;
-			soundChannel.soundTransform = soundTransform;
+			manager.remove(this);
 		}
 	}
 }

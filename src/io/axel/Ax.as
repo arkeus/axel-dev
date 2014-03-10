@@ -18,26 +18,24 @@ package io.axel {
 	import flash.ui.MultitouchInputMode;
 	import flash.utils.getTimer;
 	
+	import io.axel.base.AxEntity;
 	import io.axel.camera.AxCamera;
-	import io.axel.collision.AxGroupCollider;
 	import io.axel.collision.AxCollider;
 	import io.axel.collision.AxGridCollider;
+	import io.axel.collision.AxGroupCollider;
 	import io.axel.input.AxKey;
 	import io.axel.input.AxKeyboard;
 	import io.axel.input.AxMouse;
 	import io.axel.render.AxColor;
 	import io.axel.render.AxShader;
 	import io.axel.resource.AxResource;
-	import io.axel.sound.AxMusic;
-	import io.axel.sound.AxSound;
+	import io.axel.sound.AxSoundManager;
 	import io.axel.state.AxStateStack;
 	import io.axel.tilemap.AxTilemap;
 	import io.axel.util.AxCache;
 	import io.axel.util.AxLogger;
 	import io.axel.util.AxPauseState;
 	import io.axel.util.debug.AxDebugger;
-	import io.axel.base.AxEntity;
-	import io.axel.base.AxGroup;
 
 	/**
 	 * The general game class that your base class should extends. Contains all the properties of the game,
@@ -156,36 +154,13 @@ package io.axel {
 		public static var camera:AxCamera;
 
 		/**
-		 * Read-only. A group containing all the currently active sounds, including music.
+		 * Read-only. The sound manager.
 		 */
-		public static var sounds:AxGroup;
+		public static var sound:AxSoundManager;
 		/**
-		 * The volume of music in the game. Use this to globally control the volume of all music in your game.
-		 *
-		 * @default 1
+		 * Read-only. The music manager.
 		 */
-		public static var musicVolume:Number;
-		/**
-		 * The volume of sounds in the game. Use this to globally control the volume of all sounds in your game.
-		 *
-		 * @default 1
-		 */
-		public static var soundVolume:Number;
-		/**
-		 * A flag indicating whether music is muted. Set this to true to mute all music without losing the current
-		 * volume level of the music.
-		 *
-		 * @default false
-		 */
-		public static var musicMuted:Boolean;
-		/**
-		 * A flag indicating whether sounds are muted. Set this to true to mute all sounds without losing the current
-		 * volume level of the sounds.
-		 *
-		 * @default false
-		 */
-		public static var soundMuted:Boolean;
-		
+		public static var music:AxSoundManager;
 		/**
 		 * The background color of the game. The alpha component is ignored, as the background is always opaque.
 		 * 
@@ -296,11 +271,8 @@ package io.axel {
 			Ax.unfocusedFramerate = 20;
 			Ax.background = new AxColor(0.5, 0.5, 0.5);
 
-			Ax.sounds = new AxGroup;
-			Ax.musicVolume = 1;
-			Ax.soundVolume = 1;
-			Ax.musicMuted = false;
-			Ax.soundMuted = false;
+			Ax.sound = new AxSoundManager;
+			Ax.music = new AxSoundManager;
 
 			var debugStacktrace:String = new Error().getStackTrace();
 			Ax.debug = debugStacktrace != null && debugStacktrace.search(/:[0-9]+]$/m) > -1;
@@ -595,7 +567,8 @@ package io.axel {
 			states.update();
 			camera.update();
 			mouse.update(mouseX, mouseY);
-			sounds.update();
+			sound.update();
+			music.update();
 		}
 
 		/**
@@ -637,40 +610,6 @@ package io.axel {
 		 */
 		public static function get zoom():Number {
 			return Ax.worldZoom;
-		}
-
-		/**
-		 * Plays an embedded sound file.
-		 *
-		 * @param soundFile The embedded file to play.
-		 * @param volume The volume to play it at, 1 being the base (eg. 2 = double the global sound volume level).
-		 * @param loop Whether or not this sound should loop.
-		 * @param start The starting position (in ms) where the sound should begin playing at.
-		 *
-		 * @return The sound object.
-		 */
-		public static function playSound(soundFile:Class, volume:Number = 1, loop:Boolean = false, start:Number = 0):AxSound {
-			var soundObject:AxSound = new AxSound(soundFile, Ax.soundMuted ? 0 : volume * Ax.soundVolume, loop, start);
-			soundObject.play();
-			sounds.add(soundObject);
-			return soundObject;
-		}
-
-		/**
-		 * Plays an embedded music file.
-		 *
-		 * @param soundFile The embedded file to play.
-		 * @param volume The volume to play it at, 1 being the base (eg. 2 = double the global music volume level).
-		 * @param loop Whether not this music should loop.
-		 * @param start The starting position (in ms) where the music should begin playing at.
-		 *
-		 * @return The sound object.
-		 */
-		public static function playMusic(soundFile:Class, volume:Number = 1, loop:Boolean = true, start:Number = 0):AxSound {
-			var soundObject:AxSound = new AxMusic(soundFile, Ax.musicMuted ? 0 : volume * Ax.musicVolume, loop, start);
-			soundObject.play();
-			sounds.add(soundObject);
-			return soundObject;
 		}
 		
 		
