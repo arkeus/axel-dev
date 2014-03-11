@@ -1,4 +1,7 @@
 package io.axel.sound {
+	/**
+	 * A manager used for playing and keeping track of audio.
+	 */
 	public class AxSoundManager {
 		public var sounds:Vector.<AxSound>;
 		public var muted:Boolean;
