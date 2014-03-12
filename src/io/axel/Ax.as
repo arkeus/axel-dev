@@ -29,7 +29,7 @@ package io.axel {
 	import io.axel.render.AxColor;
 	import io.axel.render.AxShader;
 	import io.axel.resource.AxResource;
-	import io.axel.sound.AxSoundManager;
+	import io.axel.sound.AxAudioManager;
 	import io.axel.state.AxStateStack;
 	import io.axel.tilemap.AxTilemap;
 	import io.axel.util.AxCache;
@@ -156,11 +156,11 @@ package io.axel {
 		/**
 		 * Read-only. The sound manager.
 		 */
-		public static var sound:AxSoundManager;
+		public static var sound:AxAudioManager;
 		/**
 		 * Read-only. The music manager.
 		 */
-		public static var music:AxSoundManager;
+		public static var music:AxAudioManager;
 		/**
 		 * The background color of the game. The alpha component is ignored, as the background is always opaque.
 		 * 
@@ -271,8 +271,8 @@ package io.axel {
 			Ax.unfocusedFramerate = 20;
 			Ax.background = new AxColor(0.5, 0.5, 0.5);
 
-			Ax.sound = new AxSoundManager;
-			Ax.music = new AxSoundManager;
+			Ax.sound = new AxAudioManager;
+			Ax.music = new AxAudioManager;
 
 			var debugStacktrace:String = new Error().getStackTrace();
 			Ax.debug = debugStacktrace != null && debugStacktrace.search(/:[0-9]+]$/m) > -1;

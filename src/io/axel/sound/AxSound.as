@@ -20,7 +20,7 @@ package io.axel.sound {
 		/**
 		 * The sound manager this sound belongs to.
 		 */
-		public var manager:AxSoundManager;
+		public var manager:AxAudioManager;
 		/**
 		 * The requested volume of the sound, between 0 and 1. The current volume can be accessed through the
 		 * volume property, which will be 0 if the sound is muted. This will always contained the requested
@@ -53,7 +53,7 @@ package io.axel.sound {
 		 * @param start The time (in ms) of how far into the sound it should start playing.
 		 * @param panning The panning of the sound between -1 (left) and 1 (right). 0 means balanced in the middle.
 		 */
-		public function AxSound(manager:AxSoundManager, sound:Class, volumeLevel:Number = 1, loops:uint = 0, start:Number = 0, panning:Number = 0) {
+		public function AxSound(manager:AxAudioManager, sound:Class, volumeLevel:Number = 1, loops:uint = 0, start:Number = 0, panning:Number = 0) {
 			this.manager = manager;
 			this.sound = new sound();
 			this.requestedVolume = volumeLevel;

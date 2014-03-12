@@ -2,12 +2,12 @@ package io.axel.sound {
 	/**
 	 * A manager used for playing and keeping track of audio.
 	 */
-	public class AxSoundManager {
+	public class AxAudioManager {
 		public var sounds:Vector.<AxSound>;
 		public var muted:Boolean;
 		public var volume:Number;
 		
-		public function AxSoundManager() {
+		public function AxAudioManager() {
 			this.sounds = new Vector.<AxSound>;
 			this.muted = false;
 			this.volume = 1;
@@ -54,7 +54,7 @@ package io.axel.sound {
 			return soundObject;
 		}
 		
-		public function fadeOut(duration:Number = 1):AxSoundManager {
+		public function fadeOut(duration:Number = 1):AxAudioManager {
 			for (var i:uint = 0; i < sounds.length; i++) {
 				sounds[i].fadeOut(duration);
 			}
