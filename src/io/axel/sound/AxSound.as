@@ -3,6 +3,8 @@ package io.axel.sound {
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
+	
+	import io.axel.Ax;
 
 	/**
 	 * A sound object. For simple use cases, this class will be completely managed by Axel. However,
@@ -64,40 +66,50 @@ package io.axel.sound {
 		}
 
 		/**
-		 * Plays the sound. If loop is true, will repeat once it reaches the end.
+		 * Plays the sound. If loop is true, will repeat once it reaches the end. This method does nothing if
+		 * you have no sound card or you run out of available sound channels. The maximum amount of sounds you
+		 * can play at once is 32.
 		 *
 		 * @return
 		 */
-		public function play():AxSound {
+		public function play():void {
 			soundChannel = sound.play(start, loops, soundTransform);
+			if (soundChannel == null) {
+				destroy();
+				return;
+			}
 			soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-			return this;
 		}
 		
 		public function set volume(volumeLevel:Number):void {
 			soundTransform.volume = volumeLevel;
+			if (soundChannel != null) {
+				soundChannel.soundTransform = soundTransform;
+			}
 		}
 		
 		public function get volume():Number {
 			return soundTransform.volume;
 		}
 		
-		public function mute():void {
+		public function mute():AxSound {
 			volume = 0;
-			// WHY?
-			// soundChannel.soundTransform = soundTransform;
+			return this;
 		}
 		
-		public function unmute():void {
+		public function unmute():AxSound {
 			volume = requestedVolume;
+			return this;
 		}
 		
-		public function fadeOut(duration:Number):void {
-			deltaVolume = requestedVolume / duration;
+		public function fadeOut(duration:Number, targetVolume:Number = 0):AxSound {
+			deltaVolume = -(volume - targetVolume) / duration * Ax.dt;
+			return this;
 		}
 		
-		public function fadeIn(duration:Number):void {
-			deltaVolume = -requestedVolume / duration;
+		public function fadeIn(duration:Number, targetVolume = NaN):AxSound {
+			deltaVolume = (targetVolume || requestedVolume) / duration * Ax.dt;
+			return this;
 		}
 		
 		public function update():void {
@@ -129,10 +141,12 @@ package io.axel.sound {
 		 * Destroys the sound, freeing up resources used.
 		 */
 		public function destroy():void {
-			soundChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-			soundChannel.stop();
+			if (soundChannel != null) {
+				soundChannel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+				soundChannel.stop();
+				soundChannel = null;
+			}
 			sound = null;
-			soundChannel = null;
 			soundTransform = null;
 			manager.remove(this);
 		}
