@@ -54,9 +54,9 @@ package io.axel.sound {
 			return soundObject;
 		}
 		
-		public function fadeOut(duration:Number = 1):AxAudioManager {
+		public function fadeOut(duration:Number = 1, destroyOnComplete:Boolean = true):AxAudioManager {
 			for (var i:uint = 0; i < sounds.length; i++) {
-				sounds[i].fadeOut(duration);
+				sounds[i].fadeOut(duration, destroyOnComplete);
 			}
 			return this;
 		}
@@ -65,6 +65,20 @@ package io.axel.sound {
 			var soundObject:AxSound = create(soundFile, volumeLevel, 0, start, pan);
 			soundObject.fadeIn(duration).play();
 			return soundObject;
+		}
+		
+		public function panLeft(duration:Number):AxAudioManager {
+			for (var i:uint = 0; i < sounds.length; i++) {
+				sounds[i].panLeft(duration);
+			}
+			return this;
+		}
+		
+		public function panRight(duration:Number):AxAudioManager {
+			for (var i:uint = 0; i < sounds.length; i++) {
+				sounds[i].panRight(duration);
+			}
+			return this;
 		}
 		
 		public function remove(sound:AxSound):void {

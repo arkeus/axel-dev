@@ -41,10 +41,32 @@ package io.axel.sound {
 		 */
 		public var start:Number;
 		/**
-		 * The panning of the sound between -1 (left) and 1 (right). 0 means balanced in the middle.
+		 * The amount the volume should change per frame.
 		 */
-		public var panning:Number;
 		public var deltaVolume:Number;
+		/**
+		 * The target volume.
+		 */
+		public var targetVolume:Number;
+		/**
+		 * The panning of the sound between -1 (left) and 1 (right). 0 means balanced in the middle. The current
+		 * panning can be accessed through the panning property. This will always contain the originally requested
+		 * panning.
+		 * @default 0
+		 */
+		public var requestedPanning:Number;
+		/**
+		 * The amount the pan should change per frame.
+		 */
+		public var deltaPan:Number;
+		/**
+		 * The target pan value.
+		 */
+		public var targetPan:Number;
+		/**
+		 * Whether or not the sound should be destroyed when the current fade completes.
+		 */
+		public var destroyOnComplete:Boolean;
 
 		/**
 		 * Creates a new sound object, but does not start playing the sound.
@@ -61,8 +83,12 @@ package io.axel.sound {
 			this.requestedVolume = volumeLevel;
 			this.loops = loops;
 			this.start = start;
-			this.panning = panning;
+			this.requestedPanning = panning;
 			this.soundTransform = new SoundTransform(volumeLevel, panning);
+			this.targetVolume = requestedVolume;
+			this.targetPan = requestedPanning;
+			this.deltaPan = 0;
+			this.deltaVolume = 0;
 		}
 
 		/**
@@ -80,63 +106,189 @@ package io.axel.sound {
 			}
 			soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 		}
-		
+
+		/**
+		 * Sets the volume to a new value.
+		 * 
+		 * @param volumeLevel The new volume to set.
+		 */
 		public function set volume(volumeLevel:Number):void {
+			if (volumeLevel < 0 || volumeLevel > 1) {
+				throw new ArgumentError("Volume to set must be between 0 and 1.");
+			}
 			soundTransform.volume = volumeLevel;
 			if (soundChannel != null) {
 				soundChannel.soundTransform = soundTransform;
 			}
 		}
-		
+
+		/**
+		 * Gets the current volume.
+		 * 
+		 * @return The volume.
+		 */
 		public function get volume():Number {
 			return soundTransform.volume;
 		}
-		
+
+		/**
+		 * Immediately mutes the sound by setting the volume to 0.
+		 * 
+		 * @return This sound.
+		 */
 		public function mute():AxSound {
 			volume = 0;
 			return this;
 		}
-		
+
+		/**
+		 * Immediately unmutes the sound by setting the volume to the originally requested volume.
+		 * 
+		 * @return This sound.
+		 */
 		public function unmute():AxSound {
 			volume = requestedVolume;
 			return this;
 		}
-		
-		public function fadeOut(duration:Number, targetVolume:Number = 0):AxSound {
-			deltaVolume = -(volume - targetVolume) / duration * Ax.dt;
+
+		/**
+		 * Fades the sound out over the passed duration. By default, destroys the sound when the fade out
+		 * completes, but can be overriden by passing false to destroyOnComplete.
+		 * 
+		 * @param duration The duration of the fade effect.
+		 * @param destroyOnComplete Whether or not to destroy the sound at the end.
+		 * @return This sound.
+		 */
+		public function fadeOut(duration:Number, destroyOnComplete:Boolean = true):AxSound {
+			this.destroyOnComplete = destroyOnComplete;
+			return fade(duration, 0);
+		}
+
+		/**
+		 * Fades in the sound over the passed duration.
+		 * 
+		 * @param duration The duration of the fade effect.
+		 * @return This sound.
+		 */
+		public function fadeIn(duration:Number):AxSound {
+			return fade(duration, 1);
+		}
+
+		/**
+		 * Fades the sound to the specified volume over the passed duration.
+		 * 
+		 * @param duration The duration of the fade effect.
+		 * @param targetVolume The target volume to fade to (between 0 and 1).
+		 * @return This sound.
+		 */
+		public function fade(duration:Number, targetVolume:Number):AxSound {
+			if (targetVolume < 0 || targetVolume > 1) {
+				throw new ArgumentError("Volume to fade to must be between 0 and 1.");
+			}
+			this.targetVolume = targetVolume;
+			deltaVolume = (targetVolume - volume) / duration * Ax.dt;
 			return this;
 		}
-		
-		public function fadeIn(duration:Number, targetVolume = NaN):AxSound {
-			deltaVolume = (targetVolume || requestedVolume) / duration * Ax.dt;
+
+		/**
+		 * Immediately sets the panning of this sound to the passed value.
+		 * 
+		 * @param panValue The new panning value to use (between -1 and 1).
+		 */
+		public function set panning(panValue:Number):void {
+			if (panValue < -1 || panValue > 1) {
+				throw new ArgumentError("Panning value to set must be between -1 and 1.");
+			}
+			soundTransform.pan = panValue;
+			if (soundChannel != null) {
+				soundChannel.soundTransform = soundTransform;
+			}
+		}
+
+		/**
+		 * Gets the current panning value.
+		 * 
+		 * @return The current panning.
+		 */
+		public function get panning():Number {
+			return soundTransform.pan;
+		}
+
+		/**
+		 * Pans the sound to the left side over the passed duration.
+		 * 
+		 * @param duration The duration of the panning effect.
+		 * @return This sound.
+		 */
+		public function panLeft(duration:Number):AxSound {
+			return pan(duration, -1);
+		}
+
+		/**
+		 * Pans the sound to the right side over the passed duration.
+		 * 
+		 * @param duration The duration of the panning effect.
+		 * @return This sound.
+		 */
+		public function panRight(duration:Number):AxSound {
+			return pan(duration, 1);
+		}
+
+		/**
+		 * Pans the sound to the targetPan value over the passed duration.
+		 * 
+		 * @param duration The duration of the panning effect.
+		 * @param targetPan The target pan to fade to.
+		 * @return This sound.
+		 */
+		public function pan(duration:Number, targetPan:Number):AxSound {
+			if (targetPan < -1 || targetPan > 1) {
+				throw new ArgumentError("Panning to fade to must be between -1 and 1.");
+			}
+			this.targetPan = targetPan;
+			deltaPan = (targetPan - panning) / duration * Ax.dt;
 			return this;
 		}
-		
+
+		/**
+		 * Logic to update the sound each frame.
+		 */
 		public function update():void {
-			if (deltaVolume > 0) {
-				volume += deltaVolume;
-				if (volume > requestedVolume) {
-					volume = requestedVolume;
-					deltaVolume = 0;
+			if (deltaVolume != 0) {
+				var newVolume:Number = volume + deltaVolume;
+				if ((deltaVolume > 0 && newVolume >= targetVolume) || (deltaVolume < 0 && newVolume <= targetVolume)) {
+					if (targetVolume == 0 && destroyOnComplete) {
+						destroy();
+						return;
+					} else {
+						volume = targetVolume;
+						deltaVolume = 0;
+					}
+				} else {
+					volume = newVolume;
 				}
-			} else if (deltaVolume < 0) {
-				volume += deltaVolume;
-				if (volume < 0) {
-					volume = 0;
-					deltaVolume = 0;
+			}
+
+			if (deltaPan != 0) {
+				var newPan:Number = panning + deltaPan;
+				if ((deltaPan > 0 && newPan >= targetPan) || (deltaPan < 0 && newPan <= targetPan)) {
+					panning = targetPan;
+					deltaPan = 0;
+				} else {
+					panning = newPan;
 				}
 			}
 		}
-		
+
 		/**
 		 * Sound completion callback.
-		 * 
+		 *
 		 * @param event The sound completion event.
 		 */
 		private function onSoundComplete(event:Event):void {
 			destroy();
 		}
-		
+
 		/**
 		 * Destroys the sound, freeing up resources used.
 		 */
