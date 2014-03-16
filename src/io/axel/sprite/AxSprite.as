@@ -304,15 +304,26 @@ package io.axel.sprite {
 			var scaley:Number = scale.y;
 			var cx:Number = Ax.camera.position.x * scroll.x + Ax.camera.effectOffset.x;
 			var cy:Number = Ax.camera.position.y * scroll.y + Ax.camera.effectOffset.y;
+			
+			var rx:Number = sx - cx + AxU.EPSILON;
+			var ry:Number = sy - cy + AxU.EPSILON;
+			if (!Ax.subpixelZoom) {
+				rx = Math.round(rx);
+				ry = Math.round(ry);
+			} else {
+				rx = Math.round(rx * Ax.zoom) / Ax.zoom;
+				ry = Math.round(ry * Ax.zoom) / Ax.zoom;
+			}
+			
 			if (facing == flip) {
 				matrix.appendScale(scalex * -1, scaley, 1);
-				matrix.appendTranslation(sx - cx + AxU.EPSILON + animations.frameWidth, sy - cy + AxU.EPSILON, 0);
+				matrix.appendTranslation(rx + animations.frameWidth, ry, 0);
 			} else if (scalex != 1 || scaley != 1) {
 				matrix.appendTranslation(-origin.x, -origin.y, 0);
 				matrix.appendScale(scalex, scaley, 1);
-				matrix.appendTranslation(origin.x + sx - cx + AxU.EPSILON, origin.y + sy - cy + AxU.EPSILON, 0);
+				matrix.appendTranslation(origin.x + rx, origin.y + ry, 0);
 			} else {
-				matrix.appendTranslation(sx - cx + AxU.EPSILON, sy - cy + AxU.EPSILON, 0);
+				matrix.appendTranslation(rx, ry, 0);
 			}
 			
 			matrix.append(zooms ? Ax.camera.projection : Ax.camera.baseProjection);

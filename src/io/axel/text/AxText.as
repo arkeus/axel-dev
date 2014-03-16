@@ -295,12 +295,22 @@ package io.axel.text {
 			var cx:Number = Ax.camera.position.x * scroll.x + Ax.camera.effectOffset.x;
 			var cy:Number = Ax.camera.position.y * scroll.y + Ax.camera.effectOffset.y;
 			
+			var rx:Number = sx - cx + AxU.EPSILON - alignOffset;
+			var ry:Number = sy - cy + AxU.EPSILON;
+			if (!Ax.subpixelZoom) {
+				rx = Math.round(rx);
+				ry = Math.round(ry);
+			} else {
+				rx = Math.round(rx * Ax.zoom) / Ax.zoom;
+				ry = Math.round(ry * Ax.zoom) / Ax.zoom;
+			}
+			
 			if (scale.x != 1 || scale.y != 1) {
 				matrix.appendTranslation(-origin.x, -origin.y, 0);
 				matrix.appendScale(scale.x, scale.y, 1);
-				matrix.appendTranslation(origin.x + Math.round(sx - cx + AxU.EPSILON - alignOffset), origin.y + Math.round(sy - cy + AxU.EPSILON), 0);
+				matrix.appendTranslation(origin.x + rx, origin.y + ry, 0);
 			} else {
-				matrix.appendTranslation(Math.round(sx - cx + AxU.EPSILON - alignOffset), Math.round(sy - cy + AxU.EPSILON), 0);
+				matrix.appendTranslation(rx, ry, 0);
 			}
 			matrix.append(zooms ? Ax.camera.projection : Ax.camera.baseProjection);
 

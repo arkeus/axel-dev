@@ -71,6 +71,14 @@ package io.axel.sprite {
 			var cx:Number = (Ax.camera.position.x + Ax.camera.effectOffset.x) * ((parallaxMode & HORIZONTAL) ? 0 : scroll.x);
 			var cy:Number = (Ax.camera.position.y + Ax.camera.effectOffset.y) * ((parallaxMode & VERTICAL) ? 0 : scroll.y);
 			
+			if (!Ax.subpixelZoom) {
+				cx = Math.round(cx);
+				cy = Math.round(cy);
+			} else {
+				cx = Math.round(cx * Ax.zoom) / Ax.zoom;
+				cy = Math.round(cy * Ax.zoom) / Ax.zoom;
+			}
+			
 			matrix.appendTranslation(sx - cx + AxU.EPSILON, sy - cy + AxU.EPSILON, 0);
 			matrix.append(zooms ? Ax.camera.projection : Ax.camera.baseProjection);
 			
@@ -79,8 +87,19 @@ package io.axel.sprite {
 				Ax.shader = shader;
 			}
 			
-			uvParams[0] = (parallaxMode & HORIZONTAL) ? (Ax.camera.position.x + Ax.camera.effectOffset.x) / texture.width * scroll.x : 0;
-			uvParams[1] = (parallaxMode & VERTICAL) ? (Ax.camera.position.y + Ax.camera.effectOffset.y) / texture.height * scroll.y : 0;
+			var uvx:Number = Ax.camera.position.x + Ax.camera.effectOffset.x;
+			var uvy:Number = Ax.camera.position.y + Ax.camera.effectOffset.y;
+			
+			if (!Ax.subpixelZoom) {
+				uvx = Math.round(uvx);
+				uvy = Math.round(uvy);
+			} else {
+				uvx = Math.round(uvx * Ax.zoom) / Ax.zoom;
+				uvy = Math.round(uvy * Ax.zoom) / Ax.zoom;
+			}
+			
+			uvParams[0] = (parallaxMode & HORIZONTAL) ? uvx / texture.width * scroll.x : 0;
+			uvParams[1] = (parallaxMode & VERTICAL) ? uvy / texture.height * scroll.y : 0;
 			
 			if (blend == null) {
 				Ax.context.setBlendFactors(Context3DBlendFactor.SOURCE_ALPHA, Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA);

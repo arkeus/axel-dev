@@ -2,8 +2,9 @@ package io.axel.base {
 	import flash.display3D.Context3DBlendFactor;
 	import flash.display3D.Context3DProgramType;
 	import flash.display3D.Context3DVertexBufferFormat;
-	import io.axel.sprite.AxSprite;
+	
 	import io.axel.Ax;
+	import io.axel.sprite.AxSprite;
 	
 	/**
 	 * AxCloud is a group that allows you to draw many sprites that use the same texture efficiently. By changing the actions
@@ -354,8 +355,19 @@ package io.axel.base {
 			colorTransform[BLUE] = color.blue;
 			colorTransform[ALPHA] = color.alpha * parentEntityAlpha;
 			
+			var cx:Number = Ax.camera.position.x * scroll.x + Ax.camera.effectOffset.x;
+			var cy:Number = Ax.camera.position.y * scroll.x + Ax.camera.effectOffset.y;
+			
+			if (!Ax.subpixelZoom) {
+				cx = Math.round(cx);
+				cy = Math.round(cy);
+			} else {
+				cx = Math.round(cx * Ax.zoom) / Ax.zoom;
+				cy = Math.round(cy * Ax.zoom) / Ax.zoom;
+			}
+			
 			matrix.identity();
-			matrix.appendTranslation(x - Math.round(Ax.camera.position.x * scroll.x + Ax.camera.effectOffset.x) + parentOffset.x, y - Math.round(Ax.camera.position.y * scroll.x + Ax.camera.effectOffset.y) + parentOffset.y, 0);
+			matrix.appendTranslation(x - cx + parentOffset.x, y - cy + parentOffset.y, 0);
 			matrix.append(Ax.camera.projection);
 			
 			if (shader != Ax.shader) {

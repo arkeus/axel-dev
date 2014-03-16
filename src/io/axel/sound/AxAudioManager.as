@@ -33,6 +33,10 @@ package io.axel.sound {
 			}
 		}
 		
+		public function toggleMute():void {
+			muted ? unmute() : mute();
+		}
+		
 		public function play(soundFile:Class, volumeLevel:Number = 1, start:Number = 0, pan:Number = 0):AxSound {
 			var soundObject:AxSound = create(soundFile, volumeLevel, 0, start, pan);
 			soundObject.play();
@@ -63,7 +67,10 @@ package io.axel.sound {
 		
 		public function fadeIn(soundFile:Class, duration:Number = 1, volumeLevel:Number = 1, loops:uint = 0, start:Number = 0, pan:Number = 0):AxSound {
 			var soundObject:AxSound = create(soundFile, volumeLevel, 0, start, pan);
-			soundObject.fadeIn(duration).play();
+			if (!muted) {
+				soundObject.fadeIn(duration);
+			}
+			soundObject.play();
 			return soundObject;
 		}
 		

@@ -1,10 +1,10 @@
-## 0.9.4 r3
-* Subpixel drawing now occurs at zoom levels > 1 to allow for smooth zooming (IN PROGRESS)
+## 0.9.4 r4
 * The org.axgl package has been replaced with io.axel
+* The music/sound system has been rewritten and supports fading and panning, and is accessible through Ax.music and Ax.sound
+* Subpixel drawing is enabled and can be disabled with Ax.subpixelDrawing (read comments on subpixelDrawing in Ax.as for caveats)
 * State logic is now contained in AxStateStack. Interaction with states is done through Ax.states.push, Ax.states.pop, etc
 * Animation logic is now contained in AxAnimationSet. animation() and show() still exist but addAnimation() is now animations.add()
 * Sprite effect logic is now contained in AxSpriteEffectSet, and the APIs should be called from sprite.effect.X rather than sprite.X
-* Ax.music and Ax.sound have been renamed Ax.playMusic and Ax.playSound
 * Calculation of line width using variable width fonts are now more accurate, causing better alignment when using 'center' or 'right'
 * Generation of bitmap fonts now correctly takes into account the separator row at the top and ignores it for positioning
 * Bitmap fonts no longer assume a separating column between glyphs, but simply require a separator pixel in the upper right of each glyphs

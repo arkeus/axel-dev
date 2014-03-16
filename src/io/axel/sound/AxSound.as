@@ -187,6 +187,9 @@ package io.axel.sound {
 			}
 			this.targetVolume = targetVolume;
 			deltaVolume = (targetVolume - volume) / duration * Ax.dt;
+			if (deltaVolume == 0 && targetVolume == 0 && destroyOnComplete) {
+				destroy();
+			}
 			return this;
 		}
 

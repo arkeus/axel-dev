@@ -193,6 +193,9 @@ package io.axel.tilemap {
 			
 			this.uvWidth = 1 / (texture.width / tileWidth);
 			this.uvHeight = 1 / (texture.height / tileHeight);
+			
+			var uOffset:Number = 0 / texture.width;
+			var vOffset:Number = 0 / texture.height;
 
 			indexData = new Vector.<uint>;
 			vertexData = new Vector.<Number>;
@@ -221,12 +224,17 @@ package io.axel.tilemap {
 					var u:Number = (tid % tilesetCols) * uvWidth;
 					var v:Number = Math.floor(tid / tilesetCols) * uvHeight;
 					
+					var uvLeft:Number = u + uOffset;
+					var uvRight:Number = u + uvWidth - uOffset;
+					var uvTop:Number = v + vOffset;
+					var uvBottom:Number = v + uvHeight - vOffset;
+					
 					segment.indexData.push(segment.index, segment.index + 1, segment.index + 2, segment.index + 1, segment.index + 2, segment.index + 3);
 					segment.vertexData.push(
-						tx, 				ty,					u,				v,
-						tx + tileWidth,		ty,					u + uvWidth,	v,
-						tx,					ty + tileHeight,	u,				v + uvHeight,
-						tx + tileWidth,		ty + tileHeight,	u + uvWidth,	v + uvHeight
+						tx, 				ty,					uvLeft,				uvTop,
+						tx + tileWidth,		ty,					uvRight,	uvTop,
+						tx,					ty + tileHeight,	uvLeft,				uvBottom,
+						tx + tileWidth,		ty + tileHeight,	uvRight,	uvBottom
 					);
 					segment.index += 4;
 				}
@@ -274,9 +282,19 @@ package io.axel.tilemap {
 		 * @inheritDoc
 		 */
 		override public function draw():void {
+			var cx:Number = x - Ax.camera.position.x * scroll.x - Ax.camera.effectOffset.x + AxU.EPSILON;
+			var cy:Number = y - Ax.camera.position.y * scroll.x - Ax.camera.effectOffset.y + AxU.EPSILON;
+			if (!Ax.subpixelZoom) {
+				cx = Math.round(cx);
+				cy = Math.round(cy);
+			} else {
+				cx = Math.round(cx * Ax.zoom) / Ax.zoom;
+				cy = Math.round(cy * Ax.zoom) / Ax.zoom;
+			}
+			
 			matrix.identity();
 			matrix.appendScale(scale.x, scale.y, 1);
-			matrix.appendTranslation(x - Ax.camera.position.x * scroll.x - Ax.camera.effectOffset.x + AxU.EPSILON, y - Ax.camera.position.y * scroll.x - Ax.camera.effectOffset.y + AxU.EPSILON, 0);
+			matrix.appendTranslation(cx, cy, 0);
 			matrix.append(zooms ? Ax.camera.projection : Ax.camera.baseProjection);
 			
 			colorTransform[RED] = color.red;

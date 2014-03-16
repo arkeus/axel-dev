@@ -246,6 +246,17 @@ package io.axel {
 		 * A reference to the main game engine. You should rarely need access to this.
 		 */
 		public static var engine:Ax;
+		/**
+		 * Whether or not to enable subpixel zoom. Setting this to true allows you to zoom at non-integer levels, and will
+		 * draw entities between pixels. For example, when set to false, if your zoom level is 4 and your sprite moves
+		 * to the right, it will move in 4 pixel increments. With subpixelZoom, it will move in 1 pixel increments. You
+		 * must be careful when setting this to true. If you have a tileset or sprite sheet with no space between the frames,
+		 * the texture will bleed and you may see artifacts at the edges of sprites. To fix that, each frame in a sprite sheet
+		 * should have a 1px border that is the same pixel as the one next to it. When dealing with sprites, you can also use
+		 * a 1px transparent border around each frame.
+		 * TODO: Implement option to automatically alter spritesheets to add the border.
+		 */
+		public static var subpixelZoom:Boolean;
 
 		/**
 		 * Creates the game engine.
@@ -282,6 +293,7 @@ package io.axel {
 			Ax.initialized = false;
 			Ax.paused = false;
 			Ax.logger = new AxLogger;
+			Ax.subpixelZoom = true;
 
 			addEventListener(Event.ADDED_TO_STAGE, onStageInitialized);
 		}
@@ -599,7 +611,7 @@ package io.axel {
 			if (worldZoom <= 0) {
 				throw new Error("Zoom level must be greater than 0");
 			}
-			Ax.worldZoom = worldZoom; //Math.ceil(worldZoom);
+			Ax.worldZoom = Ax.subpixelZoom ? worldZoom : Math.ceil(worldZoom);
 			camera.calculateZoomMatrix();
 		}
 
