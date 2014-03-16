@@ -169,6 +169,19 @@ package io.axel.sound {
 		}
 		
 		/**
+		 * Fades all sounds to pan to the center over the specified duration.
+		 * 
+		 * @param duration Duration over which to pan.
+		 * @return This manager.
+		 */
+		public function panCenter(duration:Number):AxAudioManager {
+			for (var i:uint = 0; i < sounds.length; i++) {
+				sounds[i].panCenter(duration);
+			}
+			return this;
+		}
+		
+		/**
 		 * Removes a sound from the active sounds. If you specify for sounds not to be cleaned up automatically, you
 		 * should manually remove them for performance reasons. If there are many sounds that are not cleaned up,
 		 * performance will suffer. You can see how many sounds are "active" by checking the length of the sounds vector.

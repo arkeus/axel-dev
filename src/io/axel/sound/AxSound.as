@@ -236,6 +236,16 @@ package io.axel.sound {
 		public function panRight(duration:Number):AxSound {
 			return pan(duration, 1);
 		}
+		
+		/**
+		 * Pans the sound to the center over the passed duration.
+		 * 
+		 * @param duration The duration of the panning effect.
+		 * @return This sound.
+		 */
+		public function panCenter(duration:Number):AxSound {
+			return pan(duration, 0);
+		}
 
 		/**
 		 * Pans the sound to the targetPan value over the passed duration.
