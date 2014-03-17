@@ -3,14 +3,16 @@ package io.axel.util.debug {
 	
 	import io.axel.Ax;
 	import io.axel.base.AxGroup;
-	import io.axel.sprite.AxSprite;
 	import io.axel.resource.AxResource;
+	import io.axel.sprite.AxSprite;
 	import io.axel.text.AxText;
 
 	public class AxDebugger extends AxGroup {
 		public static const BAR_HEIGHT:uint = 15;
 		
+		private static const KILOBYTES_IN_BYTES:uint = 1024;
 		private static const MEGABYTES_IN_BYTES:uint = 1024 * 1024;
+		
 		private var topBar:AxSprite;
 		private var bottomBar:AxSprite;
 		private var fpsText:AxText;
@@ -33,6 +35,11 @@ package io.axel.util.debug {
 		private var displayTris:uint = 0;
 		private var displayDraws:uint = 0;
 		private var displayUpdates:uint = 0;
+		
+		private var memoryStart:Number = 0;
+		private var memoryEnd:Number = 0;
+		private var memoryTicks:uint = 0;
+		private var deltaMemory:int = 0;
 		
 		private static const HEIGHT:uint = 15;
 		
@@ -105,6 +112,19 @@ package io.axel.util.debug {
 			tris = 0;
 		}
 		
+		public function markFrameStart():void {
+			updates = 0;
+			draws = 0;
+			tris = 0;
+			memoryStart = System.totalMemory;
+		}
+		
+		public function markFrameEnd():void {
+			memoryEnd = System.totalMemory;
+			memoryTicks++;
+			deltaMemory += (memoryEnd - memoryStart);
+		}
+		
 		public function heartbeat():void {
 			if (!active) {
 				return;
@@ -116,9 +136,13 @@ package io.axel.util.debug {
 			displayDraws = draws;
 			displayTris = tris;
 			
+			var kbPerHeartbeat:Number = deltaMemory / KILOBYTES_IN_BYTES;
+			var changeString:String = kbPerHeartbeat > 0 ? "@[]+@[]" : "";
+			var deltaString:String = "@[170,170,170](" + changeString + "@[100,140,200]" + kbPerHeartbeat + "@[130,130,130]kb@[170,170,170])"
+			
 			var colorRatio:uint = Math.floor(Ax.fps / Ax.requestedFramerate * 255);
 			fpsText.text = "@[190,190,190]FPS: @[" + (255 - colorRatio) + "," + colorRatio + ",0]" + Ax.fps + "@[90,90,90]/" + Ax.requestedFramerate;
-			memoryText.text = "@[190,190,190]Memory: @[100,150,255]" + (System.totalMemory / MEGABYTES_IN_BYTES).toFixed(1) + "@[130,130,130] MB";
+			memoryText.text = "@[190,190,190]Memory: @[100,150,255]" + (System.totalMemory / MEGABYTES_IN_BYTES).toFixed(4) + "@[130,130,130] MB " + deltaString;
 			timeText.text = "@[190,190,190]Updates: @[100,150,255]" + displayUpdates + " @[170,170,170](@[100,140,200]" + displayUpdateTime + "@[130,130,130]ms@[170,170,170]) @[190,190,190]Draws: @[100,150,255]" + displayDraws + " @[170,170,170](@[100,140,200]" + displayDrawTime + "@[130,130,130]ms@[170,170,170]) @[190,190,190][@[100,150,255]" + Ax.states.length + "@[190,190,190]]";
 			
 			var renderMode:String = Ax.mode == "Software Mode" ? "@[255,0,0]Software Rendering" : "@[150,180,255]Hardware Rendering";
@@ -127,6 +151,9 @@ package io.axel.util.debug {
 			if (title != null) {
 				titleText.text = title;
 			}
+			
+			memoryTicks = 0;
+			deltaMemory = 0;
 		}
 		
 		public function set title(title:String):void {

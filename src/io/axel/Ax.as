@@ -515,8 +515,8 @@ package io.axel {
 		 * @param event The enter frame event.
 		 */
 		protected function onEnterFrame(event:Event):void {
+			debugger.markFrameStart();
 			updateTimer();
-			debugger.resetStats();
 			
 			var timer:uint = getTimer();
 			update();
@@ -533,6 +533,8 @@ package io.axel {
 				heartbeatTimer = 1;
 				heartbeat();
 			}
+			
+			debugger.markFrameEnd();
 			
 			if ((keys.pressed(AxKey.GRAVE) || keys.pressed(AxKey.BACKSLASH)) && debuggerEnabled) {
 				debugger.active = !debugger.active;
