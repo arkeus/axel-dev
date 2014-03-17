@@ -1,5 +1,6 @@
 package io.axel.util.debug {
 	import flash.system.System;
+	import flash.utils.getTimer;
 	
 	import io.axel.Ax;
 	import io.axel.base.AxGroup;
@@ -90,6 +91,7 @@ package io.axel.util.debug {
 			
 			active = false;
 			countUpdate = countDraw = false;
+			memoryStart = System.totalMemory;
 		}
 		
 		public function setUpdateTime(time:uint):void {
@@ -106,23 +108,14 @@ package io.axel.util.debug {
 			drawTime = time;
 		}
 		
-		public function resetStats():void {
-			updates = 0;
-			draws = 0;
-			tris = 0;
-		}
-		
 		public function markFrameStart():void {
 			updates = 0;
 			draws = 0;
 			tris = 0;
-			memoryStart = System.totalMemory;
 		}
 		
 		public function markFrameEnd():void {
-			memoryEnd = System.totalMemory;
-			memoryTicks++;
-			deltaMemory += (memoryEnd - memoryStart);
+			
 		}
 		
 		public function heartbeat():void {
@@ -136,7 +129,8 @@ package io.axel.util.debug {
 			displayDraws = draws;
 			displayTris = tris;
 			
-			var kbPerHeartbeat:Number = deltaMemory / KILOBYTES_IN_BYTES;
+			var kbPerHeartbeat:Number = (System.totalMemory - memoryStart) / KILOBYTES_IN_BYTES;
+			memoryStart = System.totalMemory;
 			var changeString:String = kbPerHeartbeat > 0 ? "@[]+@[]" : "";
 			var deltaString:String = "@[170,170,170](" + changeString + "@[100,140,200]" + kbPerHeartbeat + "@[130,130,130]kb@[170,170,170])"
 			
@@ -151,9 +145,6 @@ package io.axel.util.debug {
 			if (title != null) {
 				titleText.text = title;
 			}
-			
-			memoryTicks = 0;
-			deltaMemory = 0;
 		}
 		
 		public function set title(title:String):void {

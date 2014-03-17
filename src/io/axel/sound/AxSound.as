@@ -12,6 +12,8 @@ package io.axel.sound {
 	 * order to do more advanced effects.
 	 */
 	public class AxSound {
+		/** The internal flash sound class. */
+		public var soundClass:Class;
 		/** The internal flash sound object. */
 		public var sound:Sound;
 		/** The internal flash sound channel. */
@@ -67,24 +69,38 @@ package io.axel.sound {
 		 * Whether or not the sound should be destroyed when the current fade completes.
 		 */
 		public var destroyOnComplete:Boolean;
-
+		
 		/**
-		 * Creates a new sound object, but does not start playing the sound.
-		 *
+		 * Creates the sound. This should always be done before initialize is called. Any allocation
+		 * that needs to happen should happen here, and pooling will handle calling initialize to
+		 * allow reuse of this object.
+		 * 
 		 * @param sound The embedded sound file to play.
-		 * @param volume The volume to play the sound at.
-		 * @param loop Whether or not the sound should loop.
+		 */
+		public function create(soundClass:Class):void {
+			this.soundClass = soundClass;
+			this.soundTransform = new SoundTransform(0, 0);
+			this.sound = new soundClass();
+		}
+		
+		/**
+		 * Initializes a sound object, but does not start playing the sound.
+		 *
+		 * @param manager the Manager this sound belongs to.
+		 * @param volumeLevel The volume to play the sound at.
+		 * @param loops The number of loops this sound should do.
 		 * @param start The time (in ms) of how far into the sound it should start playing.
 		 * @param panning The panning of the sound between -1 (left) and 1 (right). 0 means balanced in the middle.
 		 */
-		public function AxSound(manager:AxAudioManager, sound:Class, volumeLevel:Number = 1, loops:uint = 0, start:Number = 0, panning:Number = 0) {
+		public function initialize(manager:AxAudioManager, volumeLevel:Number = 1, loops:uint = 0, start:Number = 0, panning:Number = 0):void {
 			this.manager = manager;
-			this.sound = new sound();
 			this.requestedVolume = volumeLevel;
 			this.loops = loops;
 			this.start = start;
 			this.requestedPanning = panning;
-			this.soundTransform = new SoundTransform(volumeLevel, panning);
+			this.soundTransform.volume = volumeLevel;
+			this.soundTransform.pan = panning;
+			this.soundTransform = this.soundTransform;
 			this.targetVolume = requestedVolume;
 			this.targetPan = requestedPanning;
 			this.deltaPan = 0;
@@ -303,7 +319,8 @@ package io.axel.sound {
 		}
 
 		/**
-		 * Destroys the sound, freeing up resources used.
+		 * Destroys the sound, removing it from the manager. Keeps objects around as the manager
+		 * uses a pool of these objects, and we don't want to have to reallocate them.
 		 */
 		public function destroy():void {
 			if (soundChannel != null) {
@@ -311,8 +328,6 @@ package io.axel.sound {
 				soundChannel.stop();
 				soundChannel = null;
 			}
-			sound = null;
-			soundTransform = null;
 			manager.remove(this);
 		}
 	}

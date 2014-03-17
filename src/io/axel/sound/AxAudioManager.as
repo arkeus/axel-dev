@@ -1,10 +1,14 @@
 package io.axel.sound {
+	import io.axel.pool.AxPool;
+
 	/**
 	 * A manager used for playing and keeping track of audio. Used both for sounds and music.
 	 */
 	public class AxAudioManager {
 		/** The list of currently active sounds. */
 		public var sounds:Vector.<AxSound>;
+		/** A mapping from sound class to list of cached sounds. */
+		public var cache:Object;
 		/** Whether or not this manager is muted. */
 		public var muted:Boolean;
 		/** The volume of this manager. */
@@ -15,6 +19,7 @@ package io.axel.sound {
 		 */
 		public function AxAudioManager() {
 			this.sounds = new Vector.<AxSound>;
+			this.cache = {};
 			this.muted = false;
 			this.volume = 1;
 		}
@@ -82,7 +87,7 @@ package io.axel.sound {
 		 * @return The newly created sound.
 		 */
 		public function repeat(soundFile:Class, volumeLevel:Number = 1, start:Number = 0, pan:Number = 0):AxSound {
-			var soundObject:AxSound = create(soundFile, volumeLevel, uint.MAX_VALUE, start, pan);
+			var soundObject:AxSound = create(soundFile, volumeLevel, int.MAX_VALUE, start, pan);
 			soundObject.play();
 			return soundObject;
 		}
@@ -98,7 +103,16 @@ package io.axel.sound {
 		 * @return The newly created sound.
 		 */
 		public function create(soundFile:Class, volumeLevel:Number = 1, loops:uint = 0, start:Number = 0, pan:Number = 0):AxSound {
-			var soundObject:AxSound = new AxSound(this, soundFile, volumeLevel * volume, loops, start, pan);
+			var soundCache:AxPool = cache[soundFile];
+			if (soundCache == null) {
+				soundCache = new AxPool(AxSound, 0, function(sound:AxSound):void {
+					sound.create(soundFile);
+				});
+				cache[soundFile] = soundCache;
+			}
+			
+			var soundObject:AxSound = soundCache.remove();
+			soundObject.initialize(this, volumeLevel * volume, loops, start, pan);
 			if (muted) {
 				soundObject.mute();
 			}
@@ -133,8 +147,8 @@ package io.axel.sound {
 		 * @param pan The panning (from -1 to 1, where -1 is left, 0 is center, and 1 is right) to use.
 		 * @return This manager.
 		 */
-		public function fadeIn(soundFile:Class, duration:Number = 1, volumeLevel:Number = 1, loops:uint = uint.MAX_VALUE, start:Number = 0, pan:Number = 0):AxSound {
-			var soundObject:AxSound = create(soundFile, volumeLevel, 0, start, pan);
+		public function fadeIn(soundFile:Class, duration:Number = 1, volumeLevel:Number = 1, loops:uint = int.MAX_VALUE, start:Number = 0, pan:Number = 0):AxSound {
+			var soundObject:AxSound = create(soundFile, volumeLevel, loops, start, pan);
 			if (!muted) {
 				soundObject.fadeIn(duration);
 			}
@@ -193,6 +207,7 @@ package io.axel.sound {
 			if (index >= 0) {
 				sounds.splice(index, 1);
 			}
+			cache[sound.soundClass].add(sound);
 		}
 	}
 }

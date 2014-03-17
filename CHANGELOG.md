@@ -18,6 +18,7 @@
 * Drag now takes effect as long as acceleration isn't the same sign as velocity
 * Fixed mappings for F1-F12 keys
 * Sound now stops properly when calling stop
+* A new AxPool class has been added to help with object pooling
 
 ## 0.9.3 / 2013-10-27
 * AxTilemaps are now split into segments, and you should be able to create arbitrarily big tilemaps now

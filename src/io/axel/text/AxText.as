@@ -5,8 +5,8 @@ package io.axel.text {
 	import flash.geom.Vector3D;
 	
 	import io.axel.Ax;
-	import io.axel.base.AxModel;
 	import io.axel.AxU;
+	import io.axel.base.AxModel;
 	import io.axel.render.AxColor;
 	import io.axel.resource.AxResource;
 
@@ -18,6 +18,10 @@ package io.axel.text {
 		 * The actual string to draw to the screen.
 		 */
 		private var _text:String;
+		/**
+		 * Internal vector used for calculating lines.
+		 */
+		private static var lines:Vector.<AxTextLine> = new Vector.<AxTextLine>;
 		/**
 		 * The font to use when drawing the text.
 		 */
@@ -57,6 +61,9 @@ package io.axel.text {
 			this.font = font ? font : AxResource.font;
 			this.width = this.requestedWidth = width;
 			this.align = align;
+			
+			this.indexData = new Vector.<uint>;
+			this.vertexData = new Vector.<Number>;
 
 			build();
 		}
@@ -72,6 +79,7 @@ package io.axel.text {
 		 */
 		public static function split(text:String, font:AxFont, width:uint, limitStrategy:AxTextLimitStrategy = null):Vector.<AxTextLine> {
 			var lines:Vector.<AxTextLine> = new Vector.<AxTextLine>;
+			
 			var spaceWidth:int = font.characterWidth(" ");
 			
 			if (width == 0) {
@@ -152,8 +160,8 @@ package io.axel.text {
 				return;
 			}
 			
-			indexData = new Vector.<uint>;
-			vertexData = new Vector.<Number>;
+			indexData.length = 0;
+			vertexData.length = 0;
 
 			var lines:Vector.<AxTextLine> = split(_text, font, requestedWidth, limitStrategy);
 			if (limitStrategy != null) {
