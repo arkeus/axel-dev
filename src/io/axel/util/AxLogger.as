@@ -1,6 +1,6 @@
 package io.axel.util {
 	import flash.external.ExternalInterface;
-
+	
 	import io.axel.Ax;
 
 	public class AxLogger {
@@ -11,6 +11,7 @@ package io.axel.util {
 
 		public var external:Boolean = false;
 		public var console:Boolean = false;
+		public var consoleTrace:Boolean = true;
 
 		public function AxLogger() {
 			this.external = ExternalInterface.available;
@@ -50,8 +51,10 @@ package io.axel.util {
 				if (console) {
 					Ax.debugger.log(level, arguments[i]);
 				}
-				// always trace to debugger
-				trace(arguments[i]);
+				// log to trace if consoleTrace is enabled
+				if (consoleTrace) {
+					trace(arguments[i]);
+				}
 			}
 		}
 	}

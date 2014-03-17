@@ -3,7 +3,6 @@ package io.axel.base {
 	
 	import io.axel.Ax;
 	import io.axel.AxU;
-	import io.axel.base.timer.AxTimer;
 	import io.axel.base.timer.AxTimerSet;
 
 	/**

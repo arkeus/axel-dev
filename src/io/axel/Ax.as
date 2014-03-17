@@ -324,7 +324,7 @@ package io.axel {
 				throw new Error("Stage3D is not available!");
 			}
 
-			var stage3D:Stage3D = stage.stage3Ds[0];
+			var stage3D:Stage3D = stage2D.stage3Ds[0];
 			stage3D.addEventListener(Event.CONTEXT3D_CREATE, onStageCreate);
 			stage3D.addEventListener(ErrorEvent.ERROR, function(e:Event):void {
 				throw new Error("Error encountered while setting up Stage3D: " + e);
@@ -338,22 +338,22 @@ package io.axel {
 		protected function systemSetup():void {
 			// Create keyboard and bind key events
 			keys = new AxKeyboard;
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, keys.onKeyDown);
-			stage.addEventListener(KeyboardEvent.KEY_UP, keys.onKeyUp);
+			stage2D.addEventListener(KeyboardEvent.KEY_DOWN, keys.onKeyDown);
+			stage2D.addEventListener(KeyboardEvent.KEY_UP, keys.onKeyUp);
 
 			// Create mouse and bind mouse events
 			mouse = new AxMouse;
-			stage.addEventListener(MouseEvent.MOUSE_DOWN, mouse.onMouseDown);
-			stage.addEventListener(MouseEvent.MOUSE_UP, mouse.onMouseUp);
+			stage2D.addEventListener(MouseEvent.MOUSE_DOWN, mouse.onMouseDown);
+			stage2D.addEventListener(MouseEvent.MOUSE_UP, mouse.onMouseUp);
 			
 			// Bind touch evenets
-			stage.addEventListener(TouchEvent.TOUCH_BEGIN, onTouchBegin);
-			stage.addEventListener(TouchEvent.TOUCH_MOVE, onTouchMove);
-			stage.addEventListener(TouchEvent.TOUCH_END, onTouchEnd);
+			stage2D.addEventListener(TouchEvent.TOUCH_BEGIN, onTouchBegin);
+			stage2D.addEventListener(TouchEvent.TOUCH_MOVE, onTouchMove);
+			stage2D.addEventListener(TouchEvent.TOUCH_END, onTouchEnd);
 
 			// Bind focus and unfocus events
-			stage.addEventListener(Event.DEACTIVATE, onFocusLost);
-			stage.addEventListener(Event.ACTIVATE, onFocusGained);
+			stage2D.addEventListener(Event.DEACTIVATE, onFocusLost);
+			stage2D.addEventListener(Event.ACTIVATE, onFocusGained);
 		}
 
 		/**
@@ -400,7 +400,7 @@ package io.axel {
 		protected function onFocusLost(event:Event):void {
 			keys.releaseAll();
 			mouse.releaseAll();
-			stage.frameRate = unfocusedFramerate;
+			stage2D.frameRate = unfocusedFramerate;
 			if (initialized && pauseState != null && !paused) {
 				paused = true;
 				states.push(new pauseState);
@@ -413,7 +413,7 @@ package io.axel {
 		 * @param event The focus event.
 		 */
 		protected function onFocusGained(event:Event):void {
-			stage.frameRate = requestedFramerate;
+			stage2D.frameRate = requestedFramerate;
 			if (initialized && pauseState != null && paused && states.current is AxPauseState) {
 				paused = false;
 				states.pop();
@@ -444,10 +444,10 @@ package io.axel {
 
 			Multitouch.inputMode = MultitouchInputMode.TOUCH_POINT;
 			
+			addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			
 			// Initialize the game based on requested parameters
 			initialize();
-			
-			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		
 		/**
@@ -476,8 +476,8 @@ package io.axel {
 		protected function initialize():void {
 			stage.frameRate = requestedFramerate;
 			
-			Ax.width = requestedWidth == 0 ? stage.stageWidth : requestedWidth;
-			Ax.height = requestedHeight == 0 ? stage.stageHeight : requestedHeight;
+			Ax.width = requestedWidth == 0 ? stage2D.stageWidth : requestedWidth;
+			Ax.height = requestedHeight == 0 ? stage2D.stageHeight : requestedHeight;
 			
 			context.configureBackBuffer(Ax.width, Ax.height, 16, false);
 			context.enableErrorChecking = true;

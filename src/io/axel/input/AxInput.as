@@ -53,7 +53,7 @@ package io.axel.input {
 		 * @return Whether or not the key was just pressed.
 		 */
 		public function pressed(key:uint):Boolean {
-			return keys[key] >= Ax.then && keys[key] < Ax.now && Ax.then > 0;
+			return keys[key] >= Ax.then && keys[key] <= Ax.now && Ax.then > 0;
 		}
 
 		/**
@@ -65,7 +65,7 @@ package io.axel.input {
 		 * @return Whether or not the key was just released. 
 		 */
 		public function released(key:uint):Boolean {
-			return keys[key] <= -Ax.then && keys[key] > -Ax.now && Ax.then > 0;
+			return keys[key] <= -Ax.then && keys[key] >= -Ax.now && Ax.then > 0;
 		}
 
 		/**
