@@ -1,4 +1,7 @@
 package io.axel.pool {
+	/**
+	 * A linked list allowing to for easy pooling of objects.
+	 */
 	public class AxPoolList {
 		public var head:AxPoolNode;
 		public var size:uint = 0;
