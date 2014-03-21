@@ -90,6 +90,15 @@ package io.axel.base.timer {
 			timers.push(timer);
 			return timer;
 		}
+		
+		/**
+		 * Returns the number of active timers.
+		 * 
+		 * @return The number of active timers.
+		 */
+		public function get size():uint {
+			return timers == null ? 0 : timers.length;
+		}
 
 		/**
 		 * Removes all timers currently set on this object. Does not run the callbacks of any timers currently

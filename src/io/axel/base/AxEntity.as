@@ -204,7 +204,7 @@ package io.axel.base {
 			maxVelocity = new AxVector(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
 			angle = 0;
 			drag = new AxVector;
-			offset = new AxRect;
+			offset = new AxPoint;
 			phased = false;
 			stationary = false;
 			worldBounds = null;
@@ -482,6 +482,7 @@ package io.axel.base {
 			offset = null;
 			drag = null;
 			worldBounds = null;
+			timers = null;
 		}
 		
 		/**
