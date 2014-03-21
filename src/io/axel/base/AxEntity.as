@@ -234,6 +234,7 @@ package io.axel.base {
 			previous.y = y;
 			pvelocity.x = velocity.x;
 			pvelocity.y = velocity.y;
+			pvelocity.a = velocity.a;
 			
 			if (!(stationary || (velocity.x == 0 && velocity.y == 0 && velocity.a == 0 && acceleration.x == 0 && acceleration.y == 0 && acceleration.a == 0))) {
 				velocity.x = calculateVelocity(velocity.x, acceleration.x, drag.x, maxVelocity.x);
@@ -243,27 +244,27 @@ package io.axel.base {
 				x += (velocity.x * Ax.dt) + ((pvelocity.x - velocity.x) * Ax.dt / 2);
 				y += (velocity.y * Ax.dt) + ((pvelocity.y - velocity.y) * Ax.dt / 2);
 				angle += velocity.a * Ax.dt;
+			}
+			
+			if (worldBounds != null) {
+				if (x < worldBounds.x) {
+					velocity.x = 0;
+					acceleration.x = Math.max(0, acceleration.x);
+					x = worldBounds.x;
+				} else if (x + width > worldBounds.width) {
+					velocity.x = 0;
+					acceleration.x = Math.min(0, acceleration.x);
+					x = worldBounds.width - width;
+				}
 				
-				if (worldBounds != null) {
-					if (x < worldBounds.x) {
-						velocity.x = 0;
-						acceleration.x = Math.max(0, acceleration.x);
-						x = worldBounds.x;
-					} else if (x + width > worldBounds.width) {
-						velocity.x = 0;
-						acceleration.x = Math.min(0, acceleration.x);
-						x = worldBounds.width - width;
-					}
-					
-					if (y < worldBounds.y) {
-						velocity.y = 0;
-						acceleration.y = Math.max(0, acceleration.y);
-						y = worldBounds.y;
-					} else if (y + height > worldBounds.height) {
-						velocity.y = 0;
-						acceleration.y = Math.min(0, acceleration.y);
-						y = worldBounds.height - height;
-					}
+				if (y < worldBounds.y) {
+					velocity.y = 0;
+					acceleration.y = Math.max(0, acceleration.y);
+					y = worldBounds.y;
+				} else if (y + height > worldBounds.height) {
+					velocity.y = 0;
+					acceleration.y = Math.min(0, acceleration.y);
+					y = worldBounds.height - height;
 				}
 			}
 			
