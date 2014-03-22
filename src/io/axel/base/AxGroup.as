@@ -136,6 +136,9 @@ package io.axel.base {
 			if (!exists) {
 				return false;
 			}
+			if (!(other is AxEntity)) {
+				throw new ArgumentError("Cannot overlap AxGroup with AxRect, must be an AxEntity");
+			}
 			
 			var overlapFound:Boolean = false;
 			for (var i:uint = 0; i < members.length; i++) {
@@ -174,7 +177,7 @@ package io.axel.base {
 					(member as AxGroup).scroll = scrollFactor;
 				} else if (member is AxModel) {
 					(member as AxModel).scroll.x = scrollFactor.x;
-					(member as AxModel).scroll.y= scrollFactor.y;
+					(member as AxModel).scroll.y = scrollFactor.y;
 				}
 			}
 		}
@@ -260,6 +263,7 @@ package io.axel.base {
 		override public function dispose():void {
 			clear(true);
 			members = null;
+			tempMembers = null;
 			super.dispose();
 		}
 	}
