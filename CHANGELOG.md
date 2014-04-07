@@ -1,7 +1,7 @@
 ## 0.9.4 r4
 * The org.axgl package has been replaced with io.axel
 * The music/sound system has been rewritten and supports fading and panning, and is accessible through Ax.music and Ax.sound
-* Subpixel drawing is enabled and can be disabled with Ax.subpixelDrawing (read comments on subpixelDrawing in Ax.as for caveats)
+* Subpixel zooming is enabled and can be disabled with Ax.subpixelZoom (read comments on subpixelZoom in Ax.as for caveats)
 * State logic is now contained in AxStateStack. Interaction with states is done through Ax.states.push, Ax.states.pop, etc
 * Animation logic is now contained in AxAnimationSet. animation() and show() still exist but addAnimation() is now animations.add()
 * Sprite effect logic is now contained in AxSpriteEffectSet, and the APIs should be called from sprite.effect.X rather than sprite.X
