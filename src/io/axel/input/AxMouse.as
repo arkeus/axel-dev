@@ -8,7 +8,7 @@ package io.axel.input {
 	/**
 	 * The mouse object used to test for input, and track the location of the pointer.
 	 */
-	public class AxMouse extends AxInput {
+	public class AxMouse extends AxInputDevice {
 		/**
 		 * The number of input buttons for this input object.
 		 */

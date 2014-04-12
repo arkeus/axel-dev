@@ -4,7 +4,7 @@ package io.axel.input {
 	/**
 	 * A generic input class containing general actions used by input devices such as the keyboard and mouse.
 	 */
-	public class AxInput {
+	public class AxInputDevice {
 		/**
 		 * A list of integers containing information about each key. Each key is indexed into this vector using
 		 * the constants declared in AxKey and AxMouseButton.
@@ -16,7 +16,7 @@ package io.axel.input {
 		 * 
 		 * @param inputs The number of input keys for this device.
 		 */
-		public function AxInput(inputs:uint) {
+		public function AxInputDevice(inputs:uint) {
 			keys = new Vector.<int>(inputs, true);
 		}
 

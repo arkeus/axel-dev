@@ -6,7 +6,7 @@ package io.axel.input {
 	/**
 	 * The keyboard object allowing you access to check which keys are being used.
 	 */
-	public class AxKeyboard extends AxInput {
+	public class AxKeyboard extends AxInputDevice {
 		/**
 		 * The number of input buttons for this input object.
 		 */
