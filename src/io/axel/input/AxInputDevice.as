@@ -77,5 +77,14 @@ package io.axel.input {
 				keys[i] = 0;
 			}
 		}
+		
+		/**
+		 * Returns the number of inputs this device supports.
+		 * 
+		 * @return The number of support inputs for this device.
+		 */
+		public function size():uint {
+			return keys.length;
+		}
 	}
 }
