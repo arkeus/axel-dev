@@ -250,8 +250,8 @@ package io.axel.sprite {
 		override public function update():void {
 			super.update();
 
-			screen.x = x - (Ax.camera.x + Ax.camera.offset.x) * scroll.x;
-			screen.y = y - (Ax.camera.y + Ax.camera.offset.y) * scroll.y;
+			screen.x = (x + parentOffset.x) - (Ax.camera.x + Ax.camera.offset.x) * scroll.x;
+			screen.y = (y + parentOffset.y) - (Ax.camera.y + Ax.camera.offset.y) * scroll.y;
 			
 			if (texture == null) {
 				load(AxResource.ICON);
