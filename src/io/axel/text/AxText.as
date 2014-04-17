@@ -56,6 +56,10 @@ package io.axel.text {
 		 */
 		public function AxText(x:Number, y:Number, font:AxFont, text:String, width:uint = 0, align:String = "left") {
 			super(x, y, VERTEX_SHADER, FRAGMENT_SHADER, 8);
+			
+			if (text == null) {
+				throw new ArgumentError("Cannot make AxText from null string.");
+			}
 
 			this._text = text;
 			this.font = font ? font : AxResource.font;
