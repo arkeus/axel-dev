@@ -23,6 +23,7 @@
 * Worldbounds on an entity takes effect regardless of velocity or stationary
 * AxInput has been renamed AxInputDevice
 * Fixed parent coordinates not being taken into account for screen coordinate calculation
+* Using AxSprite.show() will no longer show the previous frame for 1 frame regardless of when the show call occurs
 
 ## 0.9.3 / 2013-10-27
 * AxTilemaps are now split into segments, and you should be able to create arbitrarily big tilemaps now
