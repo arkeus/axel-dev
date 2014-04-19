@@ -181,6 +181,7 @@ package io.axel.sprite {
 		 */
 		public function show(frame:uint):AxSprite {
 			animations.show(frame);
+			animations.advance(0);
 			return this;
 		}
 		
