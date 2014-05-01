@@ -4,13 +4,13 @@ package io.axel.camera {
 	import flash.geom.Matrix3D;
 	
 	import io.axel.Ax;
+	import io.axel.AxU;
 	import io.axel.base.AxEntity;
 	import io.axel.base.AxPoint;
 	import io.axel.base.AxRect;
-	import io.axel.sprite.AxSprite;
-	import io.axel.AxU;
 	import io.axel.camera.effect.AxCameraFadeEffect;
 	import io.axel.camera.effect.AxCameraShakeEffect;
+	import io.axel.sprite.AxSprite;
 
 	/**
 	 * The basic camera that determines what is visible on the screen. The camera also acts as a visible
@@ -70,6 +70,10 @@ package io.axel.camera {
 		 * The sprite used for camera fade effects.
 		 */
 		public var sprite:AxSprite;
+		/**
+		 * Whether or not the camera has been initialized.
+		 */
+		private var initialized:Boolean;
 
 		/**
 		 * Creates a new camera.
@@ -83,7 +87,6 @@ package io.axel.camera {
 			bounds.height = Number.POSITIVE_INFINITY;
 			
 			position = new AxPoint;
-
 			projection = new Matrix3D;
 			view = new PerspectiveMatrix3D;
 			baseProjection = new Matrix3D;
@@ -100,6 +103,9 @@ package io.axel.camera {
 		 * Handles initialization that requires the camera to be in place.
 		 */
 		public function initialize():void {
+			if (initialized) {
+				throw new Error("Cannot initialize camera multiple times.");
+			}
 			sprite = new AxSprite().create(Ax.viewWidth, Ax.viewHeight, 0xffffffff);
 			sprite.alpha = 0;
 		}
