@@ -10,15 +10,16 @@ package io.axel.camera.effect {
 		public var active:Boolean;
 		
 		/** The total duration of this effect. */
-		protected var duration:Number;
+		internal var duration:Number;
 		/** The remaining duration of this effect. */
-		protected var remaining:Number;
+		internal var remaining:Number;
 		/** The callback for this effect, to be called once this effect completes. */
-		protected var callback:Function;
+		internal var callback:Function;
 		
 		public function AxCameraEffect() {
 			this.active = false;
 			this.duration = 0;
+			this.remaining = 0;
 			this.callback = null;
 		}
 		
