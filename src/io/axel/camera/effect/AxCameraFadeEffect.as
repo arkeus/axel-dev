@@ -9,20 +9,20 @@ package io.axel.camera.effect {
 	 */
 	public class AxCameraFadeEffect extends AxCameraEffect {
 		/** The source color of the effect. */
-		private var source:AxColor;
+		internal var source:AxColor;
 		/** The target color of the effect. */
-		private var target:AxColor;
+		internal var target:AxColor;
 		/** The camera */
-		private var camera:AxCamera;
+		internal var camera:AxCamera;
 		
 		/** How much the red channel of the overlay will change per second. */
-		private var redDelta:Number = 0;
+		internal var redDelta:Number = 0;
 		/** How much the green channel of the overlay will change per second. */
-		private var greenDelta:Number = 0;
+		internal var greenDelta:Number = 0;
 		/** How much the blue channel of the overlay will change per second. */
-		private var blueDelta:Number = 0;
+		internal var blueDelta:Number = 0;
 		/** How much the alpha channel of the overlay will change per second. */
-		private var alphaDelta:Number = 0;
+		internal var alphaDelta:Number = 0;
 		
 		public function AxCameraFadeEffect() {
 		}
