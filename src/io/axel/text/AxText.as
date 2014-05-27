@@ -40,6 +40,10 @@ package io.axel.text {
 		 * text changes.
 		 */
 		public var limitStrategy:AxTextLimitStrategy;
+		/**
+		 * Options that allow you to override the default values of a font such as spacing.
+		 */
+		public var options:Object;
 
 		/**
 		 * Creates a new text at the given position, using the given font. If width is 0, it will not wrap at all. If
@@ -54,7 +58,7 @@ package io.axel.text {
 		 * @param align The alignment of the text, either "left", "right", or "center".
 		 *
 		 */
-		public function AxText(x:Number, y:Number, font:AxFont, text:String, width:uint = 0, align:String = "left") {
+		public function AxText(x:Number, y:Number, font:AxFont, text:String, width:uint = 0, align:String = "left", options:Object = null) {
 			super(x, y, VERTEX_SHADER, FRAGMENT_SHADER, 8);
 			
 			if (text == null) {
@@ -68,6 +72,7 @@ package io.axel.text {
 			
 			this.indexData = new Vector.<uint>;
 			this.vertexData = new Vector.<Number>;
+			this.options = options;
 
 			build();
 		}
@@ -81,7 +86,7 @@ package io.axel.text {
 		 *
 		 * @return A vector of text lines.
 		 */
-		public static function split(text:String, font:AxFont, width:uint, limitStrategy:AxTextLimitStrategy = null):Vector.<AxTextLine> {
+		public static function split(text:String, font:AxFont, width:uint, limitStrategy:AxTextLimitStrategy = null, options:Object = null):Vector.<AxTextLine> {
 			var lines:Vector.<AxTextLine> = new Vector.<AxTextLine>;
 			
 			var spaceWidth:int = font.characterWidth(" ");
@@ -94,6 +99,9 @@ package io.axel.text {
 			var line:String = "";
 			var lineWidth:int = 0;
 			var inTag:Boolean = false;
+			
+			var hspacing:int = getOption(options, "hspacing", font.spacing.x);
+			var vspacing:int = getOption(options, "vspacing", font.spacing.y);
 
 			for each (var lineString:String in lineArray) {
 				var wordArray:Array = lineString.split(" ");
@@ -112,11 +120,11 @@ package io.axel.text {
 						}
 
 						if (!inTag) {
-							wordWidth += font.characterWidth(character) + font.spacing.x;
+							wordWidth += font.characterWidth(character) + hspacing;
 						}
 					}
 
-					wordWidth -= font.spacing.x;
+					wordWidth -= hspacing;
 
 					if (lineWidth + wordWidth > width) {
 						lines.push(new AxTextLine(line, lineWidth - linePadding));
@@ -132,7 +140,7 @@ package io.axel.text {
 							lineWidth += wordWidth + linePadding;
 						} else {
 							line += " " + wordString;
-							linePadding = font.spacing.x + spaceWidth + font.spacing.x;
+							linePadding = hspacing + spaceWidth + hspacing;
 							lineWidth += wordWidth + linePadding;
 						}
 					}
@@ -154,6 +162,13 @@ package io.axel.text {
 
 			return lines;
 		}
+		
+		/**
+		 * Gets a value from the passed options, or the default value if options is null or the key isn't present.
+		 */
+		private static function getOption(options:Object, key:String, defaultValue:*):* {
+			return options == null ? defaultValue : options[key] || defaultValue;
+		}
 
 		/**
 		 * Builds the mesh required to draw this object's text. Any time the text changes, this must be rebuilt and uploaded
@@ -167,13 +182,15 @@ package io.axel.text {
 			indexData.length = 0;
 			vertexData.length = 0;
 
-			var lines:Vector.<AxTextLine> = split(_text, font, requestedWidth, limitStrategy);
+			var lines:Vector.<AxTextLine> = split(_text, font, requestedWidth, limitStrategy, options);
 			if (limitStrategy != null) {
 				//_text = lines.map(function(line:AxTextLine):String { line.text }).join("\n");
 			}
 			var y:uint = 0;
 			var index:uint = 0;
 			var color:AxColor = new AxColor;
+			var hspacing:int = getOption(options, "hspacing", font.spacing.x);
+			var vspacing:int = getOption(options, "vspacing", font.spacing.y);
 			width = 0;
 			for each (var textLine:AxTextLine in lines) {
 				var x:int = 0;
@@ -237,10 +254,10 @@ package io.axel.text {
 						x + c.width,	y + c.height,	c.uv.x + c.uv.width,	c.uv.y + c.uv.height,	color.red, color.green, color.blue, color.alpha
 					);
 					index += 4;
-					x += c.width + font.spacing.x;
+					x += c.width + hspacing;
 				}
 				
-				y += font.height + font.spacing.y;
+				y += font.height + vspacing;
 			}
 
 			var vertexLength:uint = vertexData.length / shader.rowSize;
@@ -249,7 +266,7 @@ package io.axel.text {
 			vertexBuffer = Ax.context.createVertexBuffer(vertexLength, shader.rowSize);
 			vertexBuffer.uploadFromVector(vertexData, 0, vertexLength);
 			triangles = indexData.length / 3;
-			height = y - font.spacing.y;
+			height = y - vspacing;
 		}
 
 		/**
