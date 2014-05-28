@@ -12,11 +12,11 @@ package io.axel.camera.effect {
 		public var y:Number;
 		
 		/** Which axes to affect. */
-		private var axes:uint;
+		internal var axes:uint;
 		/** Whether or not to ease out as you complete the effect. */
-		private var ease:Boolean;
+		internal var ease:Boolean;
 		/** The intensity of the shake. */
-		private var intensity:Number;
+		internal var intensity:Number;
 		
 		public function AxCameraShakeEffect() {
 			this.x = 0;
