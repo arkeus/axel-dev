@@ -257,11 +257,15 @@ package io.axel {
 		 * TODO: Implement option to automatically alter spritesheets to add the border.
 		 */
 		public static var subpixelZoom:Boolean;
+		/**
+		 * Whether or not to assume textures have premultiplied alpha, and to unpremultiply it in the shader.
+		 */
+		public static var premultipliedAlpha:Boolean = false;
 
 		/**
 		 * Creates the game engine.
 		 */
-		public function Ax(initialState:Class = null, width:uint = 0, height:uint = 0, zoom:uint = 1, framerate:uint = 60, fixedTimestep:Boolean = false) {
+		public function Ax(initialState:Class = null, width:uint = 0, height:uint = 0, zoom:uint = 1, framerate:uint = 60, fixedTimestep:Boolean = false, premultipliedAlpha:Boolean = true) {
 			if (zoom < 1) {
 				throw new Error("Zoom level must be an integer greater than 0");
 			}
@@ -270,6 +274,7 @@ package io.axel {
 			}
 			
 			Ax.engine = this;
+			Ax.premultipliedAlpha = premultipliedAlpha;
 			
 			Ax.requestedState = initialState;
 			Ax.requestedWidth = width;

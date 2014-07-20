@@ -133,7 +133,7 @@ package io.axel.tilemap {
 		 * @param y The y-coordinate of the tilemap.
 		 */
 		public function AxTilemap(x:Number = 0, y:Number = 0) {
-			super(x, y, VERTEX_SHADER, FRAGMENT_SHADER, 4);
+			super(x, y, 4);
 			frame = new AxRect;
 		}
 
@@ -710,27 +710,26 @@ package io.axel.tilemap {
 			}
 		}
 		
-		/**
-		 * The vertex shader for drawing tilemaps. 
-		 */
-		private static const VERTEX_SHADER:Array = [
-			// va0 = [x, y, , ]
-			// va1 = [u, v, , ]
-			// vc0 = transform matrix
-			"mov v1, va1",		// move uv to fragment shader
-			"m44 op, va0, vc0",	// multiply position by transform matrix 
-		];
+		override protected function buildVertexShader():Array {
+			return [
+				// va0 = [x, y, , ]
+				// va1 = [u, v, , ]
+				// vc0 = transform matrix
+				"mov v1, va1",		// move uv to fragment shader
+				"m44 op, va0, vc0",	// multiply position by transform matrix 
+			];
+		}
 		
-		/**
-		 * The fragment shader for drawing tilemaps.
-		 */
-		private static const FRAGMENT_SHADER:Array = [
-			// ft0 = tilemap texture
-			// v1  = uv
-			// fs0 = something
-			// fc0 = color
-			"tex ft0, v1, fs0 <2d,nearest,mipnone>", // sample texture
-			"mul oc, fc0, ft0",						 // multiply by color+alpha
-		];
+		override protected function buildFragmentShader():Array {
+			return [
+				// ft0 = tilemap texture
+				// v1  = uv
+				// fs0 = something
+				// fc0 = color
+				"tex ft0, v1, fs0 <2d,nearest,mipnone>", // sample texture
+				Ax.premultipliedAlpha ? "div ft0.xyz, ft0.xyz, ft0.w" : null,
+				"mul oc, fc0, ft0",						 // multiply by color+alpha
+			];
+		}
 	}
 }

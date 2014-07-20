@@ -36,7 +36,7 @@ package io.axel.particle {
 		 * @param effect The effect that contains all the settings to use for this particle cloud.
 		 */
 		public function AxParticleCloud(effect:AxParticleEffect) {
-			super(0, 0, VERTEX_SHADER, FRAGMENT_SHADER, 19);
+			super(0, 0, 19);
 			this.effect = effect;
 			matrix = new Matrix3D;
 			tempVector = new Vector.<Number>(4, true);
@@ -214,54 +214,52 @@ package io.axel.particle {
 			return other.build();
 		}
 		
-		/**
-		 * The vertex shader used to draw particle clouds. 
-		 */
-		public static const VERTEX_SHADER:Array = [
-			// vc0-3 = global transform matrix
-			// vc4 = time
-			// vc5 = 0.5t^2
-			// vc5 = progress (0 - 1)
-			// va0 = x, y
-			// va1 = u, v
-			// va2 = vx, vy
-			// va3 = ax, ay
-			// va4 = start scale, end scale
-			// va5 = lifetime
-			// va6 = start color
-			// va7 = end color
-			"mov v1, 		va1", 					// copy uv to fragment shader
-			"mov vt0, 		va0", 					// move x, y to vt0
-			// use velocity to adjust position
-			"mul vt1, 		va2, 		vc4",		// multiply velocity by time, vt1
-			"add vt0.xy, 	vt0.xy,		vt1.xy", 	// add dx.xy to position.xy, vt0
-			// use acceleration to adjust position
-			"mul vt1,		va3,		vc5", 		// multiply acceleration by 0.5t^2, vt1
-			"add vt0.xy,	vt0.xy,		vt1.xy", 	// add dx.xy to position.xy, vt0
-			// calculate progress (0 - 1)
-			"div vt2,		vc4,		va5", 		// divide time lived by lifetime
-			"sat vt2,		vt2", 					// clamp between 0 and 1, vt2.x = progress
-			// calculate scale
-			"sub vt3.y,		va4.x,		va4.y", 	// find total amount scale should change, vt3.y
-			"mul vt3.y,		vt3.y,		vt2.x", 	// multiply progress by scale change
-			"mov vt3.z,		va4.x", 				// move start scale into vt3.z
-			"sub vt3.z,		vt3.z, 		vt3.y", 	// subtract end scale from vt3.z
-			"mul vt0.x,     vt0.x,		vt3.z", 	// multiply current scale by x
-			"mul vt0.y,     vt0.y,		vt3.z", 	// multiply current scale by y
-			// calculate color and alpha
-			"sub vt4,		va6,		va7", 		// find how much each color component should change
-			"mul vt4,		vt4,		vt2.xxxx", 	// find how much it has changed so far
-			"sub v2,		va6,		vt4", 		// subtract how much it has changed from the start value to get current value
-			// apply world transform
-			"m44 op, 		vt0, 		vc0"	 	// multiply by global transformation
-		];
+		override protected function buildVertexShader():Array {
+			return [
+				// vc0-3 = global transform matrix
+				// vc4 = time
+				// vc5 = 0.5t^2
+				// vc5 = progress (0 - 1)
+				// va0 = x, y
+				// va1 = u, v
+				// va2 = vx, vy
+				// va3 = ax, ay
+				// va4 = start scale, end scale
+				// va5 = lifetime
+				// va6 = start color
+				// va7 = end color
+				"mov v1, 		va1", 					// copy uv to fragment shader
+				"mov vt0, 		va0", 					// move x, y to vt0
+				// use velocity to adjust position
+				"mul vt1, 		va2, 		vc4",		// multiply velocity by time, vt1
+				"add vt0.xy, 	vt0.xy,		vt1.xy", 	// add dx.xy to position.xy, vt0
+				// use acceleration to adjust position
+				"mul vt1,		va3,		vc5", 		// multiply acceleration by 0.5t^2, vt1
+				"add vt0.xy,	vt0.xy,		vt1.xy", 	// add dx.xy to position.xy, vt0
+				// calculate progress (0 - 1)
+				"div vt2,		vc4,		va5", 		// divide time lived by lifetime
+				"sat vt2,		vt2", 					// clamp between 0 and 1, vt2.x = progress
+				// calculate scale
+				"sub vt3.y,		va4.x,		va4.y", 	// find total amount scale should change, vt3.y
+				"mul vt3.y,		vt3.y,		vt2.x", 	// multiply progress by scale change
+				"mov vt3.z,		va4.x", 				// move start scale into vt3.z
+				"sub vt3.z,		vt3.z, 		vt3.y", 	// subtract end scale from vt3.z
+				"mul vt0.x,     vt0.x,		vt3.z", 	// multiply current scale by x
+				"mul vt0.y,     vt0.y,		vt3.z", 	// multiply current scale by y
+				// calculate color and alpha
+				"sub vt4,		va6,		va7", 		// find how much each color component should change
+				"mul vt4,		vt4,		vt2.xxxx", 	// find how much it has changed so far
+				"sub v2,		va6,		vt4", 		// subtract how much it has changed from the start value to get current value
+				// apply world transform
+				"m44 op, 		vt0, 		vc0"	 	// multiply by global transformation
+			];
+		}
 		
-		/**
-		 * The fragment shader used to draw particle clouds.
-		 */
-		public static const FRAGMENT_SHADER:Array = [
-			"tex ft0, v1, fs0 <2d,nearest,mipnone>",
-			"mul oc, ft0, v2",
-		];
+		override protected function buildFragmentShader():Array {
+			return [
+				"tex ft0, v1, fs0 <2d,nearest,mipnone>",
+				"mul oc, ft0, v2",
+			];
+		}
 	}
 }

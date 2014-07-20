@@ -59,7 +59,7 @@ package io.axel.text {
 		 *
 		 */
 		public function AxText(x:Number, y:Number, font:AxFont, text:String, width:uint = 0, align:String = "left", options:Object = null) {
-			super(x, y, VERTEX_SHADER, FRAGMENT_SHADER, 8);
+			super(x, y, 8);
 			
 			if (text == null) {
 				throw new ArgumentError("Cannot make AxText from null string.");
@@ -370,29 +370,28 @@ package io.axel.text {
 			}
 		}
 		
-		/**
-		 * The vertex shader for this text.
-		 */
-		private static const VERTEX_SHADER:Array = [
-			// va0 = [x, y, , ]
-			// va1 = [u, v, , ]
-			// vc0 = transform matrix
-			"mov v1, va1",			// move uv to fragment shader
-			"mov v2, va2",			// move rgba to fragment shader
-			"m44 op, va0, vc0"		// multiply position by transform matrix 
-		];
+		override protected function buildVertexShader():Array {
+			return [
+				// va0 = [x, y, , ]
+				// va1 = [u, v, , ]
+				// vc0 = transform matrix
+				"mov v1, va1",			// move uv to fragment shader
+				"mov v2, va2",			// move rgba to fragment shader
+				"m44 op, va0, vc0"		// multiply position by transform matrix 
+			];
+		}
 		
-		/**
-		 * The fragment shader for this text.
-		 */
-		private static const FRAGMENT_SHADER:Array = [
-			// ft0 = texture sampled color
-			// v1  = uv
-			// fs0 = tilemap texture
-			// fc0 = color
-			"tex ft0, v1, fs0 <2d,nearest,mipnone>",	// sample texture
-			"mul ft1, fc0, v2",						    // multiply global color by color of character
-			"mul oc, ft1, ft0",							// multiply by color+alpha
-		];
+		override protected function buildFragmentShader():Array {
+			return [
+				// ft0 = texture sampled color
+				// v1  = uv
+				// fs0 = tilemap texture
+				// fc0 = color
+				"tex ft0, v1, fs0 <2d,nearest,mipnone>",	// sample texture
+				"mul ft1, fc0, v2",						    // multiply global color by color of character
+				Ax.premultipliedAlpha ? "div ft0.xyz, ft0.xyz, ft0.w" : null,
+				"mul oc, ft1, ft0",							// multiply by color+alpha
+			];
+		}
 	}
 }

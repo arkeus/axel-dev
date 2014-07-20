@@ -23,7 +23,7 @@ package io.axel.sprite {
 		protected var uvParams:Vector.<Number>;
 		
 		public function AxParallaxSprite(x:Number, y:Number, graphic:*) {
-			super(x, y, VERTEX_SHADER, FRAGMENT_SHADER, 4, "AxParallaxSprite");
+			super(x, y, 4, "AxParallaxSprite");
 			load(graphic);
 			parallaxMode = BOTH;
 		}
@@ -124,24 +124,23 @@ package io.axel.sprite {
 			}
 		}
 		
-		/**
-		 * The parallax vertex shader for this sprite.
-		 */
-		private static const VERTEX_SHADER:Array = [
-			"add v0.xyzw, va1.xyxy, vc4.xyxy",
-			"m44 op, va0, vc0",
-		];
+		override protected function buildVertexShader():Array {
+			return [
+				"add v0.xyzw, va1.xyxy, vc4.xyxy",
+				"m44 op, va0, vc0",
+			];
+		};
 		
-		/**
-		 * The parallax fragment shader for this sprite.
-		 */
-		private static const FRAGMENT_SHADER:Array = [
-			"div ft0.xyxy, v0.xyxy, fc4.zwzw",
-			"frc ft0.xyzw, ft0.xyxy",
-			"mul ft0.xyxy, ft.xyxy, fc4.zwzw",
-			"tex ft0, ft0, fs0 <2d,repeat,nearest>",
-			"mul oc, fc0, ft0"
-		];
+		override protected function buildFragmentShader():Array {
+			return [
+				"div ft0.xyxy, v0.xyxy, fc4.zwzw",
+				"frc ft0.xyzw, ft0.xyxy",
+				"mul ft0.xyxy, ft.xyxy, fc4.zwzw",
+				"tex ft0, ft0, fs0 <2d,repeat,nearest>",
+				Ax.premultipliedAlpha ? "div ft0.xyz, ft0.xyz, ft0.w" : null,
+				"mul oc, fc0, ft0",
+			];
+		};
 		
 		/**
 		 * A static sprite index buffer that all AxParallaxSprites will use.

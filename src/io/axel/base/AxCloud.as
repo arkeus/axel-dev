@@ -83,7 +83,7 @@ package io.axel.base {
 		 * @param capacity The maximum number of objects that can be added to this cloud. Lower is more efficient.
 		 */
 		public function AxCloud(x:Number = 0, y:Number = 0, capacity:uint = MAX_CAPACITY) {
-			super(x, y, VERTEX_SHADER, FRAGMENT_SHADER, 8);
+			super(x, y, 8);
 			
 			if (capacity > MAX_CAPACITY) {
 				throw new Error("Maximum capacity of an AxCloud is " + MAX_CAPACITY + " sprites");
@@ -473,31 +473,30 @@ package io.axel.base {
 			super.dispose();
 		}
 		
-		/**
-		 * The vertex shader for drawing clouds. 
-		 */
-		private static const VERTEX_SHADER:Array = [
-			// va0 = [x, y, , ]
-			// va1 = [u, v, , ]
-			// va2 = [r, g, b, a]
-			// vc0 = transform matrix
-			"mov v1, va1",			// move uv to fragment shader
-			"mov v2, va2",			// move color transform to fragment shader
-			"m44 op, va0, vc0"		// multiply position by transform matrix 
-		];
+		override protected function buildVertexShader():Array {
+			return [
+				// va0 = [x, y, , ]
+				// va1 = [u, v, , ]
+				// va2 = [r, g, b, a]
+				// vc0 = transform matrix
+				"mov v1, va1",			// move uv to fragment shader
+				"mov v2, va2",			// move color transform to fragment shader
+				"m44 op, va0, vc0"		// multiply position by transform matrix 
+			];
+		}
 		
-		/**
-		 * The fragment shader for drawing clouds.
-		 */
-		private static const FRAGMENT_SHADER:Array = [
-			// ft0 = tilemap texture
-			// v1  = uv
-			// v2  = rgba
-			// fs0 = something
-			// fc0 = color
-			"tex ft0, v1, fs0 <2d,nearest,mipnone>",	// sample texture
-			"mul ft1, v2, fc0",						// multiple sprite color by global color
-			"mul oc, ft0, ft1",							// multiply texture by color
-		];
+		override protected function buildFragmentShader():Array {
+			return [
+				// ft0 = tilemap texture
+				// v1  = uv
+				// v2  = rgba
+				// fs0 = something
+				// fc0 = color
+				"tex ft0, v1, fs0 <2d,nearest,mipnone>",	// sample texture
+				"mul ft1, v2, fc0",							// multiple sprite color by global color
+				Ax.premultipliedAlpha ? "div ft0.xyz, ft0.xyz, ft0.w" : null,
+				"mul oc, ft0, ft1",							// multiply texture by color
+			];
+		}
 	}
 }

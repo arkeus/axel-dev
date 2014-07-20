@@ -1,16 +1,18 @@
 package io.axel.base {
 	import flash.display3D.IndexBuffer3D;
 	import flash.display3D.VertexBuffer3D;
+	import flash.errors.IllegalOperationError;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
+	import flash.utils.getQualifiedClassName;
 	
+	import io.axel.Ax;
+	import io.axel.AxU;
 	import io.axel.render.AxBlendMode;
 	import io.axel.render.AxColor;
 	import io.axel.render.AxShader;
 	import io.axel.render.AxTexture;
 	import io.axel.util.AxCache;
-	import io.axel.Ax;
-	import io.axel.AxU;
 
 	/**
 	 * An <code>AxModel</code> is an entity that is expected to be drawn on the scene. It does not implement any drawing, but defines
@@ -93,15 +95,13 @@ package io.axel.base {
 		 *
 		 * @param x The initial x value of the object.
 		 * @param y The initial y value of the object.
-		 * @param vertexShader The vertex shader used to draw the object.
-		 * @param fragmentShader The fragment shader used to draw the object.
 		 * @param rowSize The number of values per vertex in the vertex buffer.
 		 * @param shaderKey The key to look up or cache the shader by. Uses the fully qualified class name if null.
 		 */
-		public function AxModel(x:Number, y:Number, vertexShader:Array, fragmentShader:Array, rowSize:uint, shaderKey:* = null) {
+		public function AxModel(x:Number, y:Number, rowSize:uint, shaderKey:* = null) {
 			super(x, y);
 
-			shader = AxCache.shader(shaderKey ? shaderKey : this, vertexShader, fragmentShader, rowSize);
+			shader = AxCache.shader(shaderKey ? shaderKey : this, buildVertexShader, buildFragmentShader, rowSize);
 			matrix = new Matrix3D;
 			color = new AxColor;
 			colorTransform = new Vector.<Number>(4, true);
@@ -173,6 +173,30 @@ package io.axel.base {
 			origin.x = width / 2;
 			origin.y = height / 2;
 			return this;
+		}
+		
+		/**
+		 * This method must return the vertex shader used for the class. Each subclass should
+		 * implement this to return the shader. Under normal circumstances, it will only be
+		 * called once, for the first object created of the class type, as shaders are cached
+		 * on a per-class basis.
+		 * 
+		 * @return This class's vertex shader.
+		 */
+		protected function buildVertexShader():Array {
+			throw new IllegalOperationError("Class " + getQualifiedClassName(this) + " does not implement buildVertexShader");
+		}
+		
+		/**
+		 * This method must return the fragment shader used for the class. Each subclass should
+		 * implement this to return the shader. Under normal circumstances, it will only be
+		 * called once, for the first object created of the class type, as shaders are cached
+		 * on a per-class basis.
+		 * 
+		 * @return This class's fragment shader.
+		 */
+		protected function buildFragmentShader():Array {
+			throw new IllegalOperationError("Class " + getQualifiedClassName(this) + " does not implement buildFragmentShader");
 		}
 		
 		/**

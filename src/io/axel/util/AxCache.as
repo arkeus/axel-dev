@@ -29,14 +29,14 @@ package io.axel.util {
 			shaders = {};
 		}
 		
-		public static function shader(shaderKey:*, vertex:Array, fragment:Array, rowSize:uint):AxShader {
+		public static function shader(shaderKey:*, vertexCallback:Function, fragmentCallback:Function, rowSize:uint):AxShader {
 			var key:String = shaderKey is String ? shaderKey : getQualifiedClassName(shaderKey);
 			var shader:AxShader = shaders[key] as AxShader;
 			if (shader == null) {
 				if (key == "null") {
 					throw new Error();
 				}
-				shader = new AxShader(vertex, fragment, rowSize);
+				shader = new AxShader(vertexCallback(), fragmentCallback(), rowSize);
 				shaders[key] = shader;
 			}
 			return shader;

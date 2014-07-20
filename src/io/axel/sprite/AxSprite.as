@@ -70,7 +70,7 @@ package io.axel.sprite {
 		 * @param frameHeight The height of each frame in the embedded graphic.
 		 */
 		public function AxSprite(x:Number = 0, y:Number = 0, graphic:Class = null, frameWidth:uint = 0, frameHeight:uint = 0) {
-			super(x, y, VERTEX_SHADER, FRAGMENT_SHADER, 4, "AxSprite");
+			super(x, y, 4, "AxSprite");
 
 			animations = new AxAnimationSet;
 			matrix = new Matrix3D;
@@ -406,23 +406,22 @@ package io.axel.sprite {
 			effects = null;
 			super.dispose();
 		}
-
-		/**
-		 * The vertex shader for this sprite.
-		 */
-		private static const VERTEX_SHADER:Array = [
-			"m44 vt0, va0, vc0",
-			"add v0, va1, vc4",
-			"mov op, vt0"
-		];
-
-		/**
-		 * The fragment shader for this sprite.
-		 */
-		private static const FRAGMENT_SHADER:Array = [
-			"tex ft0, v0, fs0 <2d,nearest,mipnone>",
-			"mul oc, fc0, ft0"
-		];
+		
+		override protected function buildVertexShader():Array {
+			return [
+				"m44 vt0, va0, vc0",
+				"add v0, va1, vc4",
+				"mov op, vt0"
+			];
+		}
+		
+		override protected function buildFragmentShader():Array {
+			return [
+				"tex ft0, v0, fs0 <2d,nearest,mipnone>",
+				Ax.premultipliedAlpha ? "div ft0.xyz, ft0.xyz, ft0.w" : null,
+				"mul oc, fc0, ft0"
+			];
+		}
 
 		/**
 		 * A static sprite index buffer that all AxSprites will use.
