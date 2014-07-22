@@ -407,7 +407,7 @@ package io.axel.sprite {
 			super.dispose();
 		}
 		
-		override protected function buildVertexShader():Array {
+		override public function buildVertexShader():Array {
 			return [
 				"m44 vt0, va0, vc0",
 				"add v0, va1, vc4",
@@ -415,7 +415,7 @@ package io.axel.sprite {
 			];
 		}
 		
-		override protected function buildFragmentShader():Array {
+		override public function buildFragmentShader():Array {
 			return [
 				"tex ft0, v0, fs0 <2d,nearest,mipnone>",
 				Ax.premultipliedAlpha ? "div ft0.xyz, ft0.xyz, ft0.w" : null,

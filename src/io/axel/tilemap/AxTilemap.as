@@ -710,7 +710,7 @@ package io.axel.tilemap {
 			}
 		}
 		
-		override protected function buildVertexShader():Array {
+		override public function buildVertexShader():Array {
 			return [
 				// va0 = [x, y, , ]
 				// va1 = [u, v, , ]
@@ -720,7 +720,7 @@ package io.axel.tilemap {
 			];
 		}
 		
-		override protected function buildFragmentShader():Array {
+		override public function buildFragmentShader():Array {
 			return [
 				// ft0 = tilemap texture
 				// v1  = uv

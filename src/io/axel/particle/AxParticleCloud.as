@@ -214,7 +214,7 @@ package io.axel.particle {
 			return other.build();
 		}
 		
-		override protected function buildVertexShader():Array {
+		override public function buildVertexShader():Array {
 			return [
 				// vc0-3 = global transform matrix
 				// vc4 = time
@@ -255,7 +255,7 @@ package io.axel.particle {
 			];
 		}
 		
-		override protected function buildFragmentShader():Array {
+		override public function buildFragmentShader():Array {
 			return [
 				"tex ft0, v1, fs0 <2d,nearest,mipnone>",
 				"mul oc, ft0, v2",

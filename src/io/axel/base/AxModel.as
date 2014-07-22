@@ -12,6 +12,7 @@ package io.axel.base {
 	import io.axel.render.AxColor;
 	import io.axel.render.AxShader;
 	import io.axel.render.AxTexture;
+	import io.axel.render.ShaderProvider;
 	import io.axel.util.AxCache;
 
 	/**
@@ -19,7 +20,7 @@ package io.axel.base {
 	 * the common functionality used for drawing, such as creating vertex buffers and defining a shader. <code>AxSprite</code> is the
 	 * most basic implementation of an <code>AxModel</code>, and should be used for all your basic sprite needs.
 	 */
-	public class AxModel extends AxEntity {
+	public class AxModel extends AxEntity implements ShaderProvider {
 		/** The vertex shader used to draw this model. */
 		protected var vertexShader:Array;
 		/** The fragment shader used to draw this model. */
@@ -101,7 +102,7 @@ package io.axel.base {
 		public function AxModel(x:Number, y:Number, rowSize:uint, shaderKey:* = null) {
 			super(x, y);
 
-			shader = AxCache.shader(shaderKey ? shaderKey : this, buildVertexShader, buildFragmentShader, rowSize);
+			shader = AxCache.shader(shaderKey ? shaderKey : this, this, rowSize);
 			matrix = new Matrix3D;
 			color = new AxColor;
 			colorTransform = new Vector.<Number>(4, true);
@@ -176,26 +177,16 @@ package io.axel.base {
 		}
 		
 		/**
-		 * This method must return the vertex shader used for the class. Each subclass should
-		 * implement this to return the shader. Under normal circumstances, it will only be
-		 * called once, for the first object created of the class type, as shaders are cached
-		 * on a per-class basis.
-		 * 
-		 * @return This class's vertex shader.
+		 * @inheritDoc
 		 */
-		protected function buildVertexShader():Array {
+		public function buildVertexShader():Array {
 			throw new IllegalOperationError("Class " + getQualifiedClassName(this) + " does not implement buildVertexShader");
 		}
 		
 		/**
-		 * This method must return the fragment shader used for the class. Each subclass should
-		 * implement this to return the shader. Under normal circumstances, it will only be
-		 * called once, for the first object created of the class type, as shaders are cached
-		 * on a per-class basis.
-		 * 
-		 * @return This class's fragment shader.
+		 * @inheritDoc
 		 */
-		protected function buildFragmentShader():Array {
+		public function buildFragmentShader():Array {
 			throw new IllegalOperationError("Class " + getQualifiedClassName(this) + " does not implement buildFragmentShader");
 		}
 		

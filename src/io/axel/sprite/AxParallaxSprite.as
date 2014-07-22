@@ -124,14 +124,14 @@ package io.axel.sprite {
 			}
 		}
 		
-		override protected function buildVertexShader():Array {
+		override public function buildVertexShader():Array {
 			return [
 				"add v0.xyzw, va1.xyxy, vc4.xyxy",
 				"m44 op, va0, vc0",
 			];
 		};
 		
-		override protected function buildFragmentShader():Array {
+		override public function buildFragmentShader():Array {
 			return [
 				"div ft0.xyxy, v0.xyxy, fc4.zwzw",
 				"frc ft0.xyzw, ft0.xyxy",
