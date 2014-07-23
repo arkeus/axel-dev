@@ -12,7 +12,7 @@ package io.axel.base {
 	import io.axel.render.AxColor;
 	import io.axel.render.AxShader;
 	import io.axel.render.AxTexture;
-	import io.axel.render.ShaderProvider;
+	import io.axel.render.AxShaderProvider;
 	import io.axel.util.AxCache;
 
 	/**
@@ -20,7 +20,7 @@ package io.axel.base {
 	 * the common functionality used for drawing, such as creating vertex buffers and defining a shader. <code>AxSprite</code> is the
 	 * most basic implementation of an <code>AxModel</code>, and should be used for all your basic sprite needs.
 	 */
-	public class AxModel extends AxEntity implements ShaderProvider {
+	public class AxModel extends AxEntity implements AxShaderProvider {
 		/** The vertex shader used to draw this model. */
 		protected var vertexShader:Array;
 		/** The fragment shader used to draw this model. */

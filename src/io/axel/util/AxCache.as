@@ -11,7 +11,7 @@ package io.axel.util {
 	import io.axel.Ax;
 	import io.axel.render.AxShader;
 	import io.axel.render.AxTexture;
-	import io.axel.render.ShaderProvider;
+	import io.axel.render.AxShaderProvider;
 	
 	public class AxCache {
 		private static var vertexBuffers:Object;
@@ -30,7 +30,7 @@ package io.axel.util {
 			shaders = {};
 		}
 		
-		public static function shader(shaderKey:*, shaderProvider:ShaderProvider, rowSize:uint):AxShader {
+		public static function shader(shaderKey:*, shaderProvider:AxShaderProvider, rowSize:uint):AxShader {
 			var key:String = shaderKey is String ? shaderKey : getQualifiedClassName(shaderKey);
 			var shader:AxShader = shaders[key] as AxShader;
 			if (shader == null) {

@@ -1,5 +1,9 @@
 package io.axel.render {
-	public interface ShaderProvider {
+	/**
+	 * Implementing classes contain logic that allows them to provider both a vertex and fragment
+	 * shader.
+	 */
+	public interface AxShaderProvider {
 		/**
 		 * This method must return the vertex shader used for the class. Under normal circumstances,
 		 * it should only be called once, for the first object created of the class type, as shaders
