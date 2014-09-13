@@ -1,4 +1,4 @@
-package io.axel.sprite {
+package io.axel.sprite.animation {
 	import io.axel.render.AxTexture;
 
 	/**
@@ -6,26 +6,13 @@ package io.axel.sprite {
 	 */
 	public class AxAnimationSet {
 		/** The current animation this sprite is playing. */
-		public var animation:AxAnimation;
+		public var animation:AxSpritesheetAnimation;
 		/** All registered animations of this set. This is a map from animation name to animation. */
 		public var animations:Object;
-		/** The current frame of the animation. If an animation is not currently playing, the currently showing frame. */
+		/** The current frame of the animation. */
 		public var frame:uint;
-		/** Read-only. The delay between switching frames used to play the current animation. */
-		public var animationDelay:Number;
-		/** Read-only. The timer for playing the current animation. */
-		public var animationTimer:Number;
-		
-		/** The number of frames per row in the loaded texture. */
-		public var framesPerRow:uint;
-		/** The width of the frame for this entity. */
-		public var frameWidth:Number;
-		/** The height of the frame for this entity. */
-		public var frameHeight:Number;
-		/** The width of the area in the texture used for these animations that the frame width maps to. */
-		public var uvWidth:Number;
-		/** The height of the area in the texture used for these animations that the frame height maps to. */
-		public var uvHeight:Number;
+		/** The spritesheet used for calculating spritesheet animations. */
+		public var spritesheet:AxSpritesheet;
 		/** The location (in whatever texture is being used) where the current frame resides. */
 		public var uvOffset:Vector.<Number>;
 		
@@ -33,12 +20,7 @@ package io.axel.sprite {
 			animation = null;
 			animations = {};
 			frame = 0;
-			animationDelay = 0;
-			animationTimer = 0;
-			
-			framesPerRow = 0;
-			frameWidth = 0;
-			frameHeight = 0;
+			spritesheet = null;
 			uvOffset = new Vector.<Number>(4, true);
 		}
 		
@@ -48,35 +30,8 @@ package io.axel.sprite {
 		 * 
 		 * @param texture The AxTexture to be used to calculate frame dimensions.
 		 */
-		public function setDimensionsFromTexture(texture:AxTexture, frameWidth:uint = 0, frameHeight:uint = 0):void {
-			if (frameWidth == 0 || frameHeight == 0) {
-				this.frameWidth = texture.rawWidth;
-				this.frameHeight = texture.rawHeight;
-			} else {
-				this.frameWidth = frameWidth;
-				this.frameHeight = frameHeight;
-			}
-			this.uvWidth = this.frameWidth / texture.width;
-			this.uvHeight = this.frameHeight / texture.height;
-			framesPerRow = Math.max(1, Math.floor(texture.rawWidth / this.frameWidth));
-		}
-		
-		/**
-		 * Sets the dimensions that allow the animation set to calculate the exact position of the current frame that should be
-		 * shown. Any sprite that shares these values could theoretically share the same animation set.
-		 * 
-		 * TODO: Allow sprites of the same type to share the same animation set.
-		 * TODO: If we want to allow arbitrary animations anywhere in a texture these needs to be properties of the animation
-		 * and not the animation set. Keeping here for now for simplicity.
-		 * 
-		 * @param framesPerRow The number of frames per row.
-		 * @param frameWidth The width of each frame.
-		 * @param frameHeight The height of each frame.
-		 */
-		public function setDimensions(framesPerRow:uint, frameWidth:Number, frameHeight:Number):void {
-			this.framesPerRow = framesPerRow;
-			this.frameWidth = frameWidth;
-			this.frameHeight = frameHeight;
+		public function buildSpritesheet(texture:AxTexture, frameWidth:uint = 0, frameHeight:uint = 0):void {
+			spritesheet = new AxSpritesheet(texture, frameWidth, frameHeight);
 		}
 		
 		/**
@@ -94,7 +49,12 @@ package io.axel.sprite {
 		 * @return The animation set.
 		 */
 		public function add(name:String, frames:Array, framerate:uint = 15, looped:Boolean = true, callback:Function = null):AxAnimationSet {
-			animations[name] = new AxAnimation(name, frames, framerate < 1 ? 15 : framerate, looped, callback);
+			animations[name] = new AxSpritesheetAnimation(name, frames, framerate < 1 ? 15 : framerate, spritesheet, looped, callback);
+			return this;
+		}
+		
+		public function addAtlas(name:String, frames:Array, framerate:uint = 15, looped:Boolean = true, callback:Function = null):AxAnimationSet {
+			animations[name] = new AxAtlasAnimation(name, frames, framerate < 1 ? 15 : framerate, spritesheet, looped, callback);
 			return this;
 		}
 		
@@ -109,8 +69,7 @@ package io.axel.sprite {
 		public function play(name:String, reset:Boolean = false):void {
 			if ((reset || animation == null || (animation != null && animation.name != name)) && animations[name] != null) {
 				animation = animations[name];
-				animationDelay = 1 / animation.framerate;
-				animationTimer = animationDelay;
+				animation.activate();
 				frame = 0;
 			}
 		}
@@ -125,7 +84,7 @@ package io.axel.sprite {
 			this.frame = frame;
 		}
 		
-		public function get current():AxAnimation {
+		public function get current():AxSpritesheetAnimation {
 			return animation;
 		}
 		
@@ -134,21 +93,10 @@ package io.axel.sprite {
 		 */
 		public function advance(dt:Number):void {
 			if (animation != null) {
-				animationTimer += dt;
-				while (animationTimer >= animationDelay) {
-					animationTimer -= animationDelay;
-					if (frame + 1 < animation.frames.length || animation.looped) {
-						frame = (frame + 1) % animation.frames.length;
-					}
-					uvOffset[0] = (animation.frames[frame] % framesPerRow) * uvWidth;
-					uvOffset[1] = Math.floor(animation.frames[frame] / framesPerRow) * uvHeight;
-					if (frame + 1 == animation.frames.length && animation.callback != null) {
-						animation.callback();
-					}
-				}
+				animation.advance(dt, uvOffset);
 			} else {
-				uvOffset[0] = (frame % framesPerRow) * uvWidth;
-				uvOffset[1] = Math.floor(frame / framesPerRow) * uvHeight;
+				uvOffset[0] = (frame % spritesheet.framesPerRow) * spritesheet.uvWidth;
+				uvOffset[1] = Math.floor(frame / spritesheet.framesPerRow) * spritesheet.uvHeight;
 			}
 		}
 		
@@ -159,7 +107,7 @@ package io.axel.sprite {
 		 * 
 		 * @return The animation with the given name, or null if none exists.
 		 */
-		public function get(name:String):AxAnimation {
+		public function get(name:String):AxSpritesheetAnimation {
 			return animations[name];
 		}
 		

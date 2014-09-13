@@ -3,10 +3,10 @@ package io.axel.tilemap {
 	import flash.display3D.Context3DProgramType;
 	
 	import io.axel.Ax;
+	import io.axel.AxU;
 	import io.axel.base.AxEntity;
 	import io.axel.base.AxModel;
 	import io.axel.base.AxRect;
-	import io.axel.AxU;
 	import io.axel.util.AxCache;
 
 	/**
@@ -89,6 +89,22 @@ package io.axel.tilemap {
 		 * The height of the uv box for each tile.
 		 */
 		protected var uvHeight:Number;
+		/**
+		 * The size in uv coordinates of the padding.
+		 */
+		protected var uvPadding:Number;
+		/**
+		 * The size in uv coordinates of the margin.
+		 */
+		protected var uvMargin:Number;
+		/**
+		 * Padding between each tile in the graphic. Must be uniform across the entire image.
+		 */
+		protected var spacing:int;
+		/**
+		 * Marging around the tiles in the graphic (top and left, must be uniform).
+		 */
+		protected var margin:int;
 
 		/**
 		 * The frame used to calculate collisions against other objects.
@@ -150,7 +166,7 @@ package io.axel.tilemap {
 		 *
 		 * @return The tilemap object.
 		 */
-		public function build(mapData:*, graphic:Class, tileWidth:uint, tileHeight:uint, solidIndex:uint = 1, segmentWidth:int = -1, segmentHeight:int = -1):AxTilemap {
+		public function build(mapData:*, graphic:Class, tileWidth:uint, tileHeight:uint, solidIndex:uint = 1, segmentWidth:int = -1, segmentHeight:int = -1, spacing:int = 0, margin:int = 0):AxTilemap {
 			if (tileWidth == 0 || tileHeight == 0) {
 				throw new Error("Tile size cannot be 0");
 			} else if (segmentWidth == 0 || segmentHeight == 0) {
@@ -161,9 +177,11 @@ package io.axel.tilemap {
 			this.tileWidth = tileWidth;
 			this.tileHeight = tileHeight;
 			this.solidIndex = solidIndex;
+			this.spacing = spacing;
+			this.margin = margin;
 
-			this.tilesetCols = Math.floor(texture.rawWidth / tileWidth);
-			this.tilesetRows = Math.floor(texture.rawHeight / tileHeight);
+			this.tilesetCols = Math.floor((texture.rawWidth - margin * 2 + spacing) / (tileWidth + spacing));
+			this.tilesetRows = Math.floor((texture.rawHeight - margin * 2 + spacing) / (tileHeight + spacing));
 			this.tiles = new Vector.<AxTile>;
 			this.data = new Vector.<uint>;
 			
@@ -193,6 +211,8 @@ package io.axel.tilemap {
 			
 			this.uvWidth = 1 / (texture.width / tileWidth);
 			this.uvHeight = 1 / (texture.height / tileHeight);
+			this.uvPadding = spacing == 0 ? 0 : 1 / (texture.width / spacing);
+			this.uvMargin = margin == 0 ? 0 : 1 / (texture.width / margin);
 			
 			var uOffset:Number = 0 / texture.width;
 			var vOffset:Number = 0 / texture.height;
@@ -221,8 +241,8 @@ package io.axel.tilemap {
 					
 					var tx:uint = x * tileWidth;
 					var ty:uint = y * tileHeight;
-					var u:Number = (tid % tilesetCols) * uvWidth;
-					var v:Number = Math.floor(tid / tilesetCols) * uvHeight;
+					var u:Number = uvMargin + (tid % tilesetCols) * (uvWidth + uvPadding);
+					var v:Number = uvMargin + Math.floor(tid / tilesetCols) * (uvHeight + uvPadding);
 					
 					var uvLeft:Number = u + uOffset;
 					var uvRight:Number = u + uvWidth - uOffset;

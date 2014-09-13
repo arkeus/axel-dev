@@ -19,6 +19,7 @@ package io.axel.sprite {
 	import io.axel.resource.AxResource;
 	import io.axel.sprite.effect.AxSpriteEffectSet;
 	import io.axel.util.AxCache;
+	import io.axel.sprite.animation.AxAnimationSet;
 
 	/**
 	 * An <code>AxSprite</code> is the entity that makes up most game objects. You can load an image, rotate it, change
@@ -97,8 +98,8 @@ package io.axel.sprite {
 		 */
 		public function load(graphic:*, frameWidth:uint = 0, frameHeight:uint = 0):AxSprite {
 			loadTexture(graphic, frameWidth, frameHeight);
-			width = animations.frameWidth;
-			height = animations.frameHeight;
+			width = animations.spritesheet.frameWidth;
+			height = animations.spritesheet.frameHeight;
 			pivot.x = width / 2;
 			pivot.y = height / 2;
 			buildVertexBuffer(width, height, width / texture.width, height / texture.height);
@@ -153,7 +154,7 @@ package io.axel.sprite {
 		 */
 		private function loadTexture(graphic:*, frameWidth:uint, frameHeight:uint):void {
 			texture = graphic is AxTexture ? graphic : AxCache.texture(graphic);
-			animations.setDimensionsFromTexture(texture, frameWidth, frameHeight);
+			animations.buildSpritesheet(texture, frameWidth, frameHeight);
 		}
 
 		/**
@@ -284,7 +285,7 @@ package io.axel.sprite {
 		 * @inheritDoc
 		 */
 		override public function draw():void {
-			if (indexBuffer == null || (zooms && ((screen.x - offset.x) > Ax.viewWidth || (screen.y - offset.y) > Ax.viewHeight || screen.x + animations.frameWidth < 0 || screen.y + animations.frameHeight < 0)) || scale.x == 0 || scale.y == 0) {
+			if (indexBuffer == null || (zooms && ((screen.x - offset.x) > Ax.viewWidth || (screen.y - offset.y) > Ax.viewHeight || screen.x + animations.spritesheet.frameWidth < 0 || screen.y + animations.spritesheet.frameHeight < 0)) || scale.x == 0 || scale.y == 0) {
 				return;
 			}
 			
@@ -318,7 +319,7 @@ package io.axel.sprite {
 			
 			if (facing == flip) {
 				matrix.appendScale(scalex * -1, scaley, 1);
-				matrix.appendTranslation(rx + animations.frameWidth, ry, 0);
+				matrix.appendTranslation(rx + animations.spritesheet.frameWidth, ry, 0);
 			} else if (scalex != 1 || scaley != 1) {
 				matrix.appendTranslation(-origin.x, -origin.y, 0);
 				matrix.appendScale(scalex, scaley, 1);
@@ -389,8 +390,8 @@ package io.axel.sprite {
 		 * @inheritDoc
 		 */
 		override public function centerOrigin():AxModel {
-			origin.x = animations.frameWidth / 2;
-			origin.y = animations.frameHeight / 2;
+			origin.x = animations.spritesheet.frameWidth / 2;
+			origin.y = animations.spritesheet.frameHeight / 2;
 			return this;
 		}
 		

@@ -195,14 +195,14 @@ package io.axel.base {
 					vertexData[ri0 + 0 ] = sprite.x;
 					vertexData[ri0 + 1 ] = sprite.y;
 					
-					vertexData[ri1 + 0 ] = sprite.x + sprite.animations.frameWidth;
+					vertexData[ri1 + 0 ] = sprite.x + sprite.animations.spritesheet.frameWidth;
 					vertexData[ri1 + 1 ] = sprite.y;
 					
 					vertexData[ri2 + 0 ] = sprite.x;
-					vertexData[ri2 + 1 ] = sprite.y + sprite.animations.frameHeight;
+					vertexData[ri2 + 1 ] = sprite.y + sprite.animations.spritesheet.frameHeight;
 					
-					vertexData[ri3 + 0 ] = sprite.x + sprite.animations.frameWidth;
-					vertexData[ri3 + 1 ] = sprite.y + sprite.animations.frameHeight;
+					vertexData[ri3 + 0 ] = sprite.x + sprite.animations.spritesheet.frameWidth;
+					vertexData[ri3 + 1 ] = sprite.y + sprite.animations.spritesheet.frameHeight;
 				}
 				
 				if (colors) {
@@ -265,10 +265,10 @@ package io.axel.base {
 				}
 				
 				if (animates) {
-					var uvWidth:Number = sprite.animations.frameWidth / sprite.texture.width;
-					var uvHeight:Number = sprite.animations.frameHeight / sprite.texture.height;
-					var u:Number = (sprite.animations.frame % sprite.animations.framesPerRow) * uvWidth;
-					var v:Number = Math.floor(sprite.animations.frame / sprite.animations.framesPerRow) * uvHeight;
+					var uvWidth:Number = sprite.animations.spritesheet.frameWidth / sprite.texture.width;
+					var uvHeight:Number = sprite.animations.spritesheet.frameHeight / sprite.texture.height;
+					var u:Number = (sprite.animations.frame % sprite.animations.spritesheet.framesPerRow) * uvWidth;
+					var v:Number = Math.floor(sprite.animations.frame / sprite.animations.spritesheet.framesPerRow) * uvHeight;
 					
 					vertexData[ri0 + 2 ] = u;
 					vertexData[ri0 + 3 ] = v;
