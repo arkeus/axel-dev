@@ -24,6 +24,8 @@
 * AxInput has been renamed AxInputDevice
 * Fixed parent coordinates not being taken into account for screen coordinate calculation
 * Using AxSprite.show() will no longer show the previous frame for 1 frame regardless of when the show call occurs
+* Providing shaders, particularly for caching, now is based on a new AxShaderProvider interface
+* Optionally (on by default), the fragment shader will undo premultiplied alpha, changeable via Ax constructor
 
 ## 0.9.3 / 2013-10-27
 * AxTilemaps are now split into segments, and you should be able to create arbitrarily big tilemaps now
