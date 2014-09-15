@@ -1,4 +1,4 @@
-## 0.9.4 r4
+## 0.10.0 / ?
 * The org.axgl package has been replaced with io.axel
 * The music/sound system has been rewritten and supports fading and panning, and is accessible through Ax.music and Ax.sound
 * Subpixel zooming is enabled and can be disabled with Ax.subpixelZoom (read comments on subpixelZoom in Ax.as for caveats)
@@ -26,6 +26,10 @@
 * Using AxSprite.show() will no longer show the previous frame for 1 frame regardless of when the show call occurs
 * Providing shaders, particularly for caching, now is based on a new AxShaderProvider interface
 * Optionally (on by default), the fragment shader will undo premultiplied alpha, changeable via Ax constructor
+* AxAnimation has been changed to an interface, with AxSpritesheetAnimation being the current implementation
+* AxAtlasAnimation has been added, allowing you to specify specific frames at any location in an atlas
+* You can now set Ax.postUpdater and Ax.postDrawer as classes that are updated/drawn after the state stack
+* You can now get tile ids by offset into a tilemap's spritesheet via tilemap.getTileAtSpritesheet(x, y)
 
 ## 0.9.3 / 2013-10-27
 * AxTilemaps are now split into segments, and you should be able to create arbitrarily big tilemaps now
