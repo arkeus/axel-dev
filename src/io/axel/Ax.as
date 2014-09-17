@@ -18,7 +18,9 @@ package io.axel {
 	import flash.ui.MultitouchInputMode;
 	import flash.utils.getTimer;
 	
+	import io.axel.base.AxDrawable;
 	import io.axel.base.AxEntity;
+	import io.axel.base.AxUpdatable;
 	import io.axel.camera.AxCamera;
 	import io.axel.collision.AxCollider;
 	import io.axel.collision.AxGridCollider;
@@ -261,6 +263,16 @@ package io.axel {
 		 * Whether or not to assume textures have premultiplied alpha, and to unpremultiply it in the shader.
 		 */
 		public static var premultipliedAlpha:Boolean = false;
+		/**
+		 * A class that is updated after the state stack is updated. Allows you to have logic that runs an update function
+		 * every frame after the state stack is updated, regardless of what is on the stack stack.
+		 */
+		public static var postUpdater:AxUpdatable;
+		/**
+		 * A class that is drawn after the state stack is draw. Allows you to have logic that runs a draw function
+		 * every frame after the state stack is updated, regardless of what is on the stack stack.
+		 */
+		public static var postDrawer:AxDrawable;
 
 		/**
 		 * Creates the game engine.
@@ -584,6 +596,9 @@ package io.axel {
 			}
 			
 			states.update();
+			if (postUpdater != null) {
+				postUpdater.update();
+			}
 			camera.update();
 			mouse.update(mouseX, mouseY);
 			sound.update();
@@ -599,6 +614,9 @@ package io.axel {
 			context.setDepthTest(false, Context3DCompareMode.ALWAYS);
 
 			states.draw();
+			if (postDrawer != null) {
+				postDrawer.draw();
+			}
 			camera.draw();
 			
 			if (debugger.active) {
