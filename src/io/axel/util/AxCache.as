@@ -10,8 +10,8 @@ package io.axel.util {
 	
 	import io.axel.Ax;
 	import io.axel.render.AxShader;
-	import io.axel.render.AxTexture;
 	import io.axel.render.AxShaderProvider;
+	import io.axel.render.AxTexture;
 	
 	public class AxCache {
 		private static var vertexBuffers:Object;
@@ -94,18 +94,22 @@ package io.axel.util {
 			return cached;
 		}
 		
-		public static function texture(resource:*):AxTexture {
+		public static function texture(resource:*, key:String = null):AxTexture {
 			if (resource == null) {
 				throw new ArgumentError("Cannot create a texture from a null resource");
 			}
 			var rawBitmap:BitmapData;
+			var cacheKey:* = key == null && resource is Class ? resource : key;
 			if (resource is Class) {
-				if (textures[resource] != null) {
-					return textures[resource];
+				if (textures[cacheKey] != null) {
+					return textures[cacheKey];
 				}
 				rawBitmap = (new resource() as Bitmap).bitmapData;
 			} else if (resource is BitmapData) {
 				rawBitmap = resource;
+				if (cacheKey != null && textures[cacheKey] != null) {
+					return textures[cacheKey];
+				}
 			} else {
 				throw new Error("Invalid resource:", resource);
 			}
@@ -124,8 +128,8 @@ package io.axel.util {
 			var texture:Texture = Ax.context.createTexture(textureWidth, textureHeight, Context3DTextureFormat.BGRA, false);
 			texture.uploadFromBitmapData(textureBitmap);
 			
-			textures[resource] = new AxTexture(texture, textureWidth, textureHeight, rawBitmap.width, rawBitmap.height);
-			return textures[resource];
+			textures[cacheKey] = new AxTexture(texture, textureWidth, textureHeight, rawBitmap.width, rawBitmap.height);
+			return textures[cacheKey];
 		}
 		
 		public static function nextPowerOfTwo(current:uint):uint {
