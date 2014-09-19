@@ -503,6 +503,22 @@ package io.axel.tilemap {
 		}
 		
 		/**
+		 * Given a position in the spritesheet (0, 0 is the upper left), returns the AxTile representing
+		 * the tile at that position. If there is no tile, returns null.
+		 * 
+		 * @param x The x coordinate in tiles.
+		 * @param y The y coordinate in tiles.
+		 * 
+		 * @return The AxTile representing the tile at the position in the spritesheet.
+		 */
+		public function getTileAtSpritesheet(x:uint, y:uint):AxTile {
+			if (x < 0 || x >= tilesetCols || y < 0 || y >= tilesetRows) {
+				throw new Error("Tile location (" + x + "," + y + ") is out of bounds");
+			}
+			return tiles[y * tilesetCols + x + 1];
+		}
+		
+		/**
 		 * Given a pixel position, returns the AxTile representing the tile at that position. If your
 		 * tiles are 16x16, then calling this with 20, 20 is identical to calling getTileAt(1, 1).
 		 * 
