@@ -93,7 +93,7 @@ package io.axel.base {
 			}
 
 			labelY = verticalOffset;
-			label = new AxText(horizontalOffset, labelY, font, str, animations.spritesheet.frameWidth, "center");
+			label = new AxText(horizontalOffset, labelY, font, str, animations.animationTexture.frameWidth, "center");
 			if (font == null) {
 				label.setColor(.113, .113, .113);
 			}

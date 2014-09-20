@@ -6,13 +6,13 @@ package io.axel.sprite.animation {
 	 */
 	public class AxAnimationSet {
 		/** The current animation this sprite is playing. */
-		public var animation:AxSpritesheetAnimation;
+		public var animation:AxAnimation;
 		/** All registered animations of this set. This is a map from animation name to animation. */
 		public var animations:Object;
 		/** The current frame of the animation. */
 		public var frame:uint;
 		/** The spritesheet used for calculating spritesheet animations. */
-		public var spritesheet:AxSpritesheet;
+		public var animationTexture:AxAnimationTexture;
 		/** The location (in whatever texture is being used) where the current frame resides. */
 		public var uvOffset:Vector.<Number>;
 		
@@ -20,18 +20,18 @@ package io.axel.sprite.animation {
 			animation = null;
 			animations = {};
 			frame = 0;
-			spritesheet = null;
+			animationTexture = null;
 			uvOffset = new Vector.<Number>(4, true);
 		}
 		
 		/**
 		 * Given a texture, calculates the dimensions used in order to calculate the position of each frame for animations in this
-		 * set. See <code>setDimensions</code> for more.
+		 * set.
 		 * 
 		 * @param texture The AxTexture to be used to calculate frame dimensions.
 		 */
-		public function buildSpritesheet(texture:AxTexture, frameWidth:uint = 0, frameHeight:uint = 0):void {
-			spritesheet = new AxSpritesheet(texture, frameWidth, frameHeight);
+		public function buildAnimationTexture(texture:AxTexture, frameWidth:uint = 0, frameHeight:uint = 0):void {
+			animationTexture = new AxAnimationTexture(texture, frameWidth, frameHeight);
 		}
 		
 		/**
@@ -49,12 +49,12 @@ package io.axel.sprite.animation {
 		 * @return The animation set.
 		 */
 		public function add(name:String, frames:Array, framerate:uint = 15, looped:Boolean = true, callback:Function = null):AxAnimationSet {
-			animations[name] = new AxSpritesheetAnimation(name, frames, framerate < 1 ? 15 : framerate, spritesheet, looped, callback);
+			animations[name] = new AxSpritesheetAnimation(name, frames, framerate < 1 ? 15 : framerate, animationTexture, looped, callback);
 			return this;
 		}
 		
 		public function addAtlas(name:String, frames:Array, framerate:uint = 15, looped:Boolean = true, callback:Function = null):AxAnimationSet {
-			animations[name] = new AxAtlasAnimation(name, frames, framerate < 1 ? 15 : framerate, spritesheet, looped, callback);
+			animations[name] = new AxAtlasAnimation(name, frames, framerate < 1 ? 15 : framerate, animationTexture, looped, callback);
 			return this;
 		}
 		
@@ -84,7 +84,7 @@ package io.axel.sprite.animation {
 			this.frame = frame;
 		}
 		
-		public function get current():AxSpritesheetAnimation {
+		public function get current():AxAnimation {
 			return animation;
 		}
 		
@@ -95,8 +95,8 @@ package io.axel.sprite.animation {
 			if (animation != null) {
 				animation.advance(dt, uvOffset);
 			} else {
-				uvOffset[0] = (frame % spritesheet.framesPerRow) * spritesheet.uvWidth;
-				uvOffset[1] = Math.floor(frame / spritesheet.framesPerRow) * spritesheet.uvHeight;
+				uvOffset[0] = (frame % animationTexture.framesPerRow) * animationTexture.uvWidth;
+				uvOffset[1] = Math.floor(frame / animationTexture.framesPerRow) * animationTexture.uvHeight;
 			}
 		}
 		

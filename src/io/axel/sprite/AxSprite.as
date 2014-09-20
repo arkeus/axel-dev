@@ -98,8 +98,8 @@ package io.axel.sprite {
 		 */
 		public function load(graphic:*, frameWidth:uint = 0, frameHeight:uint = 0):AxSprite {
 			loadTexture(graphic, frameWidth, frameHeight);
-			width = animations.spritesheet.frameWidth;
-			height = animations.spritesheet.frameHeight;
+			width = animations.animationTexture.frameWidth;
+			height = animations.animationTexture.frameHeight;
 			pivot.x = width / 2;
 			pivot.y = height / 2;
 			buildVertexBuffer(width, height, width / texture.width, height / texture.height);
@@ -154,7 +154,7 @@ package io.axel.sprite {
 		 */
 		private function loadTexture(graphic:*, frameWidth:uint, frameHeight:uint):void {
 			texture = graphic is AxTexture ? graphic : AxCache.texture(graphic);
-			animations.buildSpritesheet(texture, frameWidth, frameHeight);
+			animations.buildAnimationTexture(texture, frameWidth, frameHeight);
 		}
 
 		/**
@@ -187,14 +187,13 @@ package io.axel.sprite {
 		}
 		
 		/**
-		 * Returns the current frame being shown. If we're showing an animation, it will be the frame being shown and not
-		 * the offset into the animation's frames. If you want to know which frame of the animation is playing (eg. the
-		 * second animation frame) then use frameOffset.
+		 * Returns the current frame being shown. If we're showing an animation, it will be the offset into the animation's
+		 * frames.
 		 * 
 		 * @return The overall frame being shown for this sprite.
 		 */
 		public function get frame():uint {
-			return animations.current == null ? animations.frame : animations.current.frames[animations.frame];
+			return animations.current == null ? animations.frame : animations.current.frame;
 		}
 		
 		/**
@@ -285,7 +284,7 @@ package io.axel.sprite {
 		 * @inheritDoc
 		 */
 		override public function draw():void {
-			if (indexBuffer == null || (zooms && ((screen.x - offset.x) > Ax.viewWidth || (screen.y - offset.y) > Ax.viewHeight || screen.x + animations.spritesheet.frameWidth < 0 || screen.y + animations.spritesheet.frameHeight < 0)) || scale.x == 0 || scale.y == 0) {
+			if (indexBuffer == null || (zooms && ((screen.x - offset.x) > Ax.viewWidth || (screen.y - offset.y) > Ax.viewHeight || screen.x + animations.animationTexture.frameWidth < 0 || screen.y + animations.animationTexture.frameHeight < 0)) || scale.x == 0 || scale.y == 0) {
 				return;
 			}
 			
@@ -319,7 +318,7 @@ package io.axel.sprite {
 			
 			if (facing == flip) {
 				matrix.appendScale(scalex * -1, scaley, 1);
-				matrix.appendTranslation(rx + animations.spritesheet.frameWidth, ry, 0);
+				matrix.appendTranslation(rx + animations.animationTexture.frameWidth, ry, 0);
 			} else if (scalex != 1 || scaley != 1) {
 				matrix.appendTranslation(-origin.x, -origin.y, 0);
 				matrix.appendScale(scalex, scaley, 1);
@@ -390,8 +389,8 @@ package io.axel.sprite {
 		 * @inheritDoc
 		 */
 		override public function centerOrigin():AxModel {
-			origin.x = animations.spritesheet.frameWidth / 2;
-			origin.y = animations.spritesheet.frameHeight / 2;
+			origin.x = animations.animationTexture.frameWidth / 2;
+			origin.y = animations.animationTexture.frameHeight / 2;
 			return this;
 		}
 		
