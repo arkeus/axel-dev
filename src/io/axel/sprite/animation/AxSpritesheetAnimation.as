@@ -47,20 +47,29 @@ package io.axel.sprite.animation {
 			animationTimer += dt;
 			while (animationTimer >= animationDelay) {
 				animationTimer -= animationDelay;
+				var triggerCallback:Boolean = false;
 				if (_frame + 1 < frames.length || looped) {
 					_frame = (_frame + 1) % frames.length;
+					if (_frame == 0 && looped) {
+						triggerCallback = true;
+					}
+				} else {
+					triggerCallback = true;
 				}
 				uvOffset[0] = (frames[_frame] % texture.framesPerRow) * texture.uvWidth;
 				uvOffset[1] = Math.floor(frames[_frame] / texture.framesPerRow) * texture.uvHeight;
-				if (_frame + 1 == frames.length && callback != null) {
+				if (triggerCallback && callback != null) {
 					callback();
 				}
 			}
 		}
 		
-		public function activate():void {
+		public function activate(uvOffset:Vector.<Number>):void {
 			animationDelay = 1 / framerate;
-			animationTimer = animationDelay;
+			animationTimer = 0;
+			_frame = 0;
+			uvOffset[0] = (frames[_frame] % texture.framesPerRow) * texture.uvWidth;
+			uvOffset[1] = Math.floor(frames[_frame] / texture.framesPerRow) * texture.uvHeight;
 		}
 		
 		public function get name():String {

@@ -46,7 +46,7 @@ package io.axel.sprite.animation {
 			}
 		}
 		
-		public function activate():void {
+		public function activate(uvOffset:Vector.<Number>):void {
 			animationDelay = 1 / framerate;
 			animationTimer = animationDelay;
 		}

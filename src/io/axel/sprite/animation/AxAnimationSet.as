@@ -69,7 +69,7 @@ package io.axel.sprite.animation {
 		public function play(name:String, reset:Boolean = false):void {
 			if ((reset || animation == null || (animation != null && animation.name != name)) && animations[name] != null) {
 				animation = animations[name];
-				animation.activate();
+				animation.activate(uvOffset);
 				frame = 0;
 			}
 		}
