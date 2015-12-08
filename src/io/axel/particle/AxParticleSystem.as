@@ -36,6 +36,26 @@ package io.axel.particle {
 			effects[effect.name] = set;
 			return set;
 		}
+		
+		/**
+		 * Registers a new particle effect with a custom name. After creating an effect, you must register it
+		 * before you can use it in your game. A custom name allows you to use the same effect for different
+		 * particle names.
+		 * 
+		 * @param effect The effect to register.
+		 *
+		 * @return The group containing all the created instances of your effect.
+		 */
+		public static function registerWithName(name:String, effect:AxParticleEffect):AxGroup {
+			var set:AxGroup = new AxGroup;
+			var particleCloud:AxParticleCloud = new AxParticleCloud(effect).build();
+			for (var i:uint = 0; i < effect.max - 1; i++) {
+				set.add(particleCloud.clone());
+			}
+			set.add(particleCloud);
+			effects[name] = set;
+			return set;
+		}
 
 		/**
 		 * Creates an instance of your particle effect on screen at the location provided. Note that to use this

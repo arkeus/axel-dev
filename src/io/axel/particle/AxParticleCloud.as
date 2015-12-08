@@ -145,6 +145,16 @@ package io.axel.particle {
 			this.visible = true;
 			this.exists = true;
 		}
+		
+		/**
+		 * Clears the particle effect out, immediately stopping it from displaying until it is emitted again.
+		 */
+		public function clear():void {
+			this.time = 0;
+			this.visible = false;
+			this.active = false;
+			this.exists = false;
+		}
 
 		override public function draw():void {
 			colorTransform[RED] = color.red;
@@ -194,8 +204,8 @@ package io.axel.particle {
 			Ax.context.setVertexBufferAt(3, null, 6, Context3DVertexBufferFormat.FLOAT_2);
 			Ax.context.setVertexBufferAt(4, null, 8, Context3DVertexBufferFormat.FLOAT_1);
 			Ax.context.setVertexBufferAt(5, null, 10, Context3DVertexBufferFormat.FLOAT_1);
-			Ax.context.setVertexBufferAt(6, null, 10, Context3DVertexBufferFormat.FLOAT_4);
-			Ax.context.setVertexBufferAt(7, null, 10, Context3DVertexBufferFormat.FLOAT_4);
+			Ax.context.setVertexBufferAt(6, null, 11, Context3DVertexBufferFormat.FLOAT_4);
+			Ax.context.setVertexBufferAt(7, null, 15, Context3DVertexBufferFormat.FLOAT_4);
 			
 			if (countTris) {
 				Ax.debugger.tris += triangles;
